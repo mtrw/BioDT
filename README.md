@@ -12,3 +12,5 @@ Represents common bioinformatics formats like fasta, bed, vcf, as `data.table`s 
 - Interfaces e.g. to pluck out chunks of [bv]cf files as data.tables, using syntax like `vcf.interface["chromosome",start,end]`
 - Various plotting and visualisation functions
 - Various convenience functions for bioinformatics tasks that keep cropping up again and again (`alleleFrequency()`, `suggestKaspMarkers()`, `setRefAlleleMostCommon()`, ...)
+
+BioDT will be implemented and maintained by [Tim Rabanus-Wallace and Kelly Rodgers](https://safes.unimelb.edu.au/research/cropgem-lab#people) from the [CropGEM lab](https://safes.unimelb.edu.au/research/cropgem-lab) at the University of Melbourne.
