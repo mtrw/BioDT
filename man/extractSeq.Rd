@@ -2,13 +2,13 @@
 % Please edit documentation in R/algorithms_extractSeq.R
 \name{extractSeq}
 \alias{extractSeq}
-\title{Extract the subsequences described by a coordinate table (typically a bed file, bed dt or similar), from a sequence list (e.g. fasta file or dt).}
+\title{Extract the subsequences described by a coordinate table (e.g. read in from a bed file or similar), from a sequence list (e.g. fasta file or dt).}
 \usage{
 extractSeq(
   bedFname = NULL,
-  bedDT = NULL,
+  coordDT = NULL,
   fastaFname = NULL,
-  fastaDT = NULL,
+  seqDT = NULL,
   outFastaFname = NULL,
   stranded = TRUE,
   nameCol = NULL,
