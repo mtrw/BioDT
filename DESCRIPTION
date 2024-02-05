@@ -1,0 +1,28 @@
+Package: BioDT
+Type: Package
+Title: Tools for writing your whole bioinformatics workflow in R using `data.table`
+Version: 0.1.0
+Author: M. Timothy Rabanus-Wallace & Kelly Rodgers
+Maintainer: M. Timothy Rabanus-Wallace <tim.rabanuswallace@unimelb.edu.au>
+Description: BioDT
+    Do all your bioinformatics from R, using `data.table`.
+    \
+    WORK IS UNDERWAY converting our lab's raggedy but much beloved set of scripts into a more aerodynamic package suitable for public consumption.
+    Represents common bioinformatics formats like fasta, bed, vcf, as `data.table`s with standardised columns, but which can be decorated or manipulated to the user's desire.
+    Includes:
+    - Read/write functions (e.g. fasta file ==> fasta data.table; bed data.table ==> bed file) and converters (e.g. alignment data.table ==> bed data.table)
+    - Wrappers for common bioinformatics tasks that call linux tools like BLAST, vcf/bcftools, bedtools, samtools, seqtk, ...
+    - Interfaces e.g. to pluck out chunks of [bv]cf files as data.tables, using syntax like `vcf.interface["chromosome",start,end]`
+    - Various plotting and visualisation functions
+    - Various convenience functions for bioinformatics tasks that keep cropping up again and again (`reverseComplement()`, `alleleFrequency()`, `suggestKaspMarkers()`, `setRefAlleleMostCommon()`, ...)
+License: CC BY-SA
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
+Imports:
+  data.table,
+  magrittr,
+  plyr,
+  stringi,
+  Rcpp
+LinkingTo: Rcpp (>= 1.0.12)
