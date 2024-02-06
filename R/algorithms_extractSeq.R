@@ -42,12 +42,12 @@ extractSeq <- function (
     strandedArg <- ""
   }
   if(!is.null(coordDT) & stranded==TRUE){
-    if(!isBedDT_outputsFileStrand(coordDT)){ stop("This bed-dt when exported will not output a score as it lacks column info for the first five requisite cols, thus strandedness cannot be applied. Yet. I will create an automated fix for this one day.") }
+    if(!isCoordDT_outputsFileStrand(coordDT)){ stop("This bed-dt when exported will not output a score as it lacks column info for the first five requisite cols, thus strandedness cannot be applied. Yet. I will create an automated fix for this one day.") }
   }
 
   if(!is.null(coordDT) & !is.null(seqDT)){ # All in DTs
-    isBedDT(coordDT)
-    isFastaDT(seqDT)
+    isCoordDT(coordDT)
+    isSeqDT(seqDT)
     #return( extractSeqFastaDTBedDT(coordDT,seqDT,stranded=stranded) )
     warning("NOT YET IMPLEMENTED, EMAIL TIM! (Will go ahead and use a stupid method instead)")
   }

@@ -22,7 +22,7 @@ readBed<- function(
     if(saveFnames){ o[,bedFname:=fn] }
     o
   }) %>% setDT
-  if(!isBedDT(out,error=F)){ stop("Resultant table does not pass validation. Check the input as at least three columns (seqId, start, end) with sensible entries.") }
+  if(!isCoordDT(out,error=F)){ stop("Resultant table does not pass validation. Check the input as at least three columns (seqId, start, end) with sensible entries.") }
   return(out)
 }
 # fn <- bedFname <- bed6Fname
@@ -39,7 +39,7 @@ writeBed <- function(
   bedFname = NULL
 ){
   bedDT <- copy(bedDT)
-  isBedDT(bedDT)
+  isCoordDT(bedDT)
   bedDT[,end:=end+1L] # To "trad" bed coords
   if(is.null(bedFname)){bedFname <- paste0(deparse(substitute(fasta)),".bed")}
   #CHOOSE ALL BED-VALID ROWS IN ORDER TO DO

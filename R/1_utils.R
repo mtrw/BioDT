@@ -366,3 +366,49 @@ timPalette <- function(colChain=c("#EEDD00FF","#009933FF"),n=100L){
     colDecToHex()
 }
 
+
+
+
+
+
+
+
+#give it "sv" as AG or CT or AGT etc, must be sorted alphabetically.
+#' @export
+IUPAC <- function(sv){
+  iupac <- c( "A", "G", "C", "T", "R" ,  "Y" ,  "S" ,  "W" ,  "K" ,  "M" ,  "B" ,   "D" ,   "H" ,   "V" ,   "N" ,   "a", "g", "c", "t", "r" ,  "y" ,  "s" ,  "w" ,  "k" ,  "m" ,  "b" ,   "d" ,   "h" ,   "v" ,   "n"    , "-")
+  nucs  <- c( "A", "G", "C", "T", "AG" , "CT" , "CG" , "AT" , "GT" , "AC" , "CGT" , "AGT" , "ACT" , "ACG" , "ACGT", "a", "g", "c", "t", "ag" , "ct" , "cg" , "at" , "gt" , "ac" , "cgt" , "agt" , "act" , "acg" , "acgt" , "-")
+  swap(sv,nucs,iupac)
+}
+#IUPAC(c("A","AT","CT","-","ACGT"))
+
+
+#' @export
+getAlnCol <- function(seqList,pos){
+  o <- vector(length(seqList),mode="character")
+  plyr::l_ply(seq_along(seqList),function(i){
+    o[i] <<- substr(seqList[[i]],pos,pos)
+  })
+  o
+}
+
+
+
+#' @export
+consensus <- function(seqList){
+  l <- stri_length(seqList[[1]])
+  s <- paste0(rep(" ",l),collapse = "")
+  for(i in 1:l){ #applyify
+    #dev i <- 7
+    col <- getAlnCol(seqList,i)
+    #ce(i)
+    if(mostCommonThing(col)=="-"){
+      substr(s,i,i) <- "-"
+    } else {
+      #browser()
+      substr(s,i,i) <- IUPAC(col[col!="-"] %>% unique %>% sort %>% paste(collapse = ""))
+    }
+    if(is.na(s)){browser()}
+  }
+  s
+}
