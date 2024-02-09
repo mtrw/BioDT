@@ -78,6 +78,9 @@ callLastz <- function(
   fread(cmd=cmd,col.names=outFmtColNames)
 }
 
+
+
+#RENAME SOON
 #' @export
 filename_nopath_noext <- function(f,newPath="",newExt=""){
   sub("\\..*","",sub(".*[\\/]","",f)) %>% paste0(newPath,.,newExt)
@@ -182,6 +185,7 @@ ldtply <- function(...){
 
 
 
+
 #' @export
 gridApplyDT <- function(dtx,dty=NULL,distFun,nameColx=NULL,nameColy=NULL,symmetrical=FALSE){
   namesx <- if(!is.null(nameColx)){
@@ -217,6 +221,8 @@ gridApplyDT <- function(dtx,dty=NULL,distFun,nameColx=NULL,nameColy=NULL,symmetr
   om
 }
 
+
+# CHANGE NAME TO SOMETHING MORE SENSIBLE SOON
 #' @export
 alnGetClumps <- function(alnDT,dist,distCutoff=1e3L,hclustAlgorithm="single"){ # CHANGE TO COORDS GET CLUMPS AND BUILD IN aln2coords CONVERSION!!!
 #alnDT <- alnRph12toPgF; distCutoff <- 1e4; nameColx = "hitId"; hclustAlgorithm="single"
@@ -275,6 +281,8 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 #most_common_thing(x=c("G",NA,"T"),draw_out = NA)
 #most_common_thing(x=c(1,1,1,2,2,2,3,3,NA,NA,NA,NA,NA),draw_out="DRAW!",na_wins_out="na was the most common",na.rm=T)
 
+
+# DELETE SOON!!!
 #' @export
 msa <- function(seqs,method="ClustalOmega",...){
   require(msa)
@@ -285,6 +293,22 @@ msa <- function(seqs,method="ClustalOmega",...){
   msa::msa(method=method,order="input",...) %>%
   msaConvert(type = "seqinr::alignment") %>%
   `[[`("seq")
+}
+
+#' @export
+MSA <- function(seqDT,method="ClustalOmega",...){
+  require(msa)
+  require(Biostrings)
+
+
+  data.table(
+    seqId=seqDT$seqId,
+    alnSeq=seqDT$seq %>%
+      Biostrings::DNAStringSet() %>%
+      msa::msa(method=method,order="input",...) %>%
+      msaConvert(type = "seqinr::alignment") %>%
+      `[[`("seq")
+  )
 }
 
 #' @export
@@ -312,10 +336,14 @@ colHexToDec <- function(col){
 
 
 #' @export
-prepadChar <- function(x,len=2,pad="0"){
-  paste0(substr(rep("00",length(x)),rep(0,length(x)),(2-stringi::stri_length(x))),x)
+postpadChar <- function(x,len=2,pad="0"){
+  paste0(x,substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))))
 }
 
+#' @export
+prepadChar <- function(x,len=2,pad="0"){
+  paste0(substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))),x)
+}
 
 
 #' @export
@@ -359,11 +387,27 @@ interpolate <- function(in_x,xs,ys){
 
 
 #' @export
-timPalette <- function(colChain=c("#EEDD00FF","#009933FF"),n=100L){
-  colHexToDec(colChain) %>%
+timPalette <- function(colChain=NULL,n=100L,show=FALSE,preset=NULL,presetAlpha="ff"){
+  if(!is.null(preset)){
+    if(!is.null(colChain)){stop("Both colChain and preset given --- please choose just one.")}
+    colChain <- timPalettePresets(name=preset,alpha=presetAlpha)
+  }
+  if(is.null(preset) & is.null(colChain)){
+    warning("Neither colChain nor preset given, a default palette will be provided.")
+    colChain <- timPalettePresets(name="wheel",alpha=presetAlpha)
+  }
+
+  colChain <- postpadChar(colChain,9,"ff")
+
+  c <- colHexToDec(colChain) %>%
     apply( . , 2 , function(c) interpolate( (1:n) %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
     round %>%
     colDecToHex()
+  if(show==TRUE){
+    null_plot(c(1:n),0:1,yaxt="n",xaxt="n")
+    abline(v=1:n,col=c,lwd=10)
+  }
+  c
 }
 
 
@@ -382,12 +426,23 @@ IUPAC <- function(sv){
 }
 #IUPAC(c("A","AT","CT","-","ACGT"))
 
-
+# DELETE SOON
 #' @export
 getAlnCol <- function(seqList,pos){
   o <- vector(length(seqList),mode="character")
   plyr::l_ply(seq_along(seqList),function(i){
     o[i] <<- substr(seqList[[i]],pos,pos)
+  })
+  o
+}
+
+
+# REINSTATE TO ggetAlnCol SOON
+#' @export
+getAlnvCol <- function(seqList,pos){
+  o <- vector(length(seqList),mode="character")
+  plyr::l_ply(seq_along(seqList),function(i){
+    o[i] <<- substr(seqList[i],pos,pos)
   })
   o
 }
@@ -411,4 +466,41 @@ consensus <- function(seqList){
     if(is.na(s)){browser()}
   }
   s
+}
+
+
+#' @export
+consensusSeq <- function(alnSeqDT,seqId="unnamed_consensus_sequence"){
+  if(!all(stringi::stri_length(alnSeqDT$alnSeq)==stringi::stri_length(alnSeqDT$alnSeq[1]))){stop("All entries in `alnSeq` column must be the same length.")}
+  l <- stringi::stri_length(alnSeqDT$alnSeq[1])
+  s <- paste0(rep(" ",l),collapse = "")
+  for(i in 1:l){ #applyify
+    #dev i <- 7
+    col <- getAlnvCol(alnSeqDT$alnSeq,i)
+    #ce(i)
+    if(mostCommonThing(col)=="-"){
+      substr(s,i,i) <- "-"
+    } else {
+      #browser()
+      substr(s,i,i) <- IUPAC(col[col!="-"] %>% unique %>% sort %>% paste(collapse = ""))
+    }
+    if(is.na(s)){browser()}
+  }
+  data.table(
+    seqId = seqId,
+    seq=s
+  )
+}
+
+#' @export
+scaleToCols <- function(x,cols){
+  selCols_i <- x %scale_between% c(1,length(cols)) %>% round
+  cols[selCols_i]
+}
+
+#' @export
+discreteToCols <- function(x,cols){
+  xx <- frank(x,ties.method = "dense")
+  selCols_i <- xx %scale_between% c(1,length(cols)) %>% round
+  cols[selCols_i]
 }

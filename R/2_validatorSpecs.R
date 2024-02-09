@@ -46,3 +46,28 @@ hasScore_valSpecs <- data.table(
   colClass = c("numeric"),
   colValidatorFun = trueFun
 )
+
+hasMinMaxSize_valSpecs <- data.table(
+  colName = c("minSize","maxSize"),
+  colClass = c("integer","integer"),
+  colValidatorFun = c(isBehavedPositive,isBehavedPositive)
+)
+
+hasOptimalSize_valSpecs <- data.table(
+  colName = c("optimalSize"),
+  colClass = c("integer"),
+  colValidatorFun = isBehavedPositive
+)
+
+hasMinMaxProductSize_valSpecs <- data.table(
+  colName = c("productMinSize","productMaxSize"),
+  colClass = c("integer","integer"),
+  colValidatorFun = c(isBehavedPositive,isBehavedPositive)
+)
+
+
+hasInternalFlag_valSpecs <- data.table(
+  colName = c("internal"),
+  colClass = c("logical"),
+  colValidatorFun = isBehaved
+)

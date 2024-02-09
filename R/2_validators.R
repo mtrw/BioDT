@@ -18,3 +18,15 @@ isSeqDT_withSeqFname <- function(validateMe,...){ isSeqDT(validateMe,...) & hasS
 isCoordDT <- makeValidator(coord_valSpecs,function(coordDT){coordDT[,all(start<=end)]})
 #' @export
 isCoordDT_outputsFileStrand <- function(validateMe,...){ isCoordDT(validateMe,...) & hasScore(validateMe,...) & hasName(validateMe,...) & hasStrand(validateMe,...) }
+#' @export
+hasMinMaxSize <- makeValidator(hasMinMaxSize_valSpecs)
+#' @export
+hasOptimalSize <- makeValidator(hasOptimalSize_valSpecs)
+#' @export
+hasInternalFlag <- makeValidator(hasInternalFlag_valSpecs)
+#' @export
+hasMinMaxProductSize <- makeValidator(hasMinMaxProductSize_valSpecs)
+
+
+
+

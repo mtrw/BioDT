@@ -24,5 +24,7 @@ Imports:
   magrittr,
   plyr,
   stringi,
-  Rcpp
+  Rcpp,
+  msa,
+  Biostrings
 LinkingTo: Rcpp (>= 1.0.12)
