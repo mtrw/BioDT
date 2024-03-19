@@ -74,9 +74,8 @@ nu <- function(x){
 # ldply but a data.table returns
 #' @export
 ldtply <- function(...){
-  ldply(...) %>% setDT
+  (ldply(...) %>% setDT)[]
 }
-
 
 
 #' @export
@@ -158,19 +157,6 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 #most_common_thing(x=c(1,1,1,2,2,2,3,3,NA,NA,NA,NA,NA),draw_out="DRAW!",na_wins_out="na was the most common",na.rm=T)
 
 
-# DELETE SOON!!!
-#' @export
-msa <- function(seqs,method="ClustalOmega",...){
-  require(msa)
-  require(Biostrings)
-
-  seqs %>%
-  Biostrings::DNAStringSet() %>%
-  msa::msa(method=method,order="input",...) %>%
-  msaConvert(type = "seqinr::alignment") %>%
-  `[[`("seq")
-}
-
 #' @export
 MSA <- function(seqDT,method="ClustalOmega",...){
   require(msa)
@@ -245,8 +231,6 @@ scale_between <- function(x,lower,upper){
 }
 
 
-
-
 #' @export
 interpolate <- function(in_x,xs,ys){
   sapply(in_x,function(ix){
@@ -258,38 +242,100 @@ interpolate <- function(in_x,xs,ys){
   })
 }
 
-
-
-
-
 #' @export
-timPalette <- function(colChain=NULL,n=100L,show=FALSE,preset=NULL,presetAlpha="ff"){
-  if(!is.null(preset)){
-    if(!is.null(colChain)){stop("Both colChain and preset given --- please choose just one.")}
-    colChain <- timPalettePresets(name=preset,alpha=presetAlpha)
-  }
-  if(is.null(preset) & is.null(colChain)){
-    warning("Neither colChain nor preset given, a default palette will be provided.")
-    colChain <- timPalettePresets(name="wheel",alpha=presetAlpha)
-  }
-
-  colChain <- postpadChar(colChain,9,"ff")
-
+makePalette <- function(colChain=NULL,n=100L,setAlpha="ff",show=FALSE){ # An evenly spaced palette interpolating the colChain
+  if(is.null(colChain)){ colChain <- palettePresets$wheel }
+  colChain <- postpadChar(colChain,9,setAlpha)
   c <- colHexToDec(colChain) %>%
     apply( . , 2 , function(c) interpolate( (1:n) %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
     round %>%
     colDecToHex()
-  if(show==TRUE){
-    null_plot(c(1:n),0:1,yaxt="n",xaxt="n")
-    abline(v=1:n,col=c,lwd=10)
+  if(show==TRUE) { showPalettes(c) }
+  c
+}
+
+#' @export
+palettePresets <- list(
+    wheel     = c("#d41313","#f7760c","#e3c607","#51a321","#0fbfae","#0f3fa6","#871b53"),
+    mclaren       = c("#232526","#00daef","#fa870c"),
+    mclaren2       = c("#030506","#fa870c"),
+    ferrari   = c("#151515","#f02929"),
+    mercedes      = c("#191919","#76dfc6","#d0d0d0"),
+    redbull        = c("#ffa800","#141823","#fe0b13"),
+    alphatauri        = c("#0b2945","#f5f8ff","#dd1010"),
+    RB             = c("#0a06b9","#e7e6eb","#d30303"),
+    astonmartin        = c("#02716c","#e7f1f6","#040300"),
+    alfaromeo        = c("#3e373e","#eff0f2","#cd0a24"),
+    sauber        = c("#111f28","#00d312"),
+    alpine        = c("#fbfeff","#ed98dd","#1766e0ff","#000010"),
+    williams        = c("#113950","#032cc6","#04367e","#18fbfe")
+)
+
+#' @export
+applyPalette <- function(x,colChain,type="guess",show=F){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
+  discrete <- if(type=="guess"){
+    is.logical(x) | is.character(x)
+  } else if (type=="discrete") {
+    TRUE
+  } else if (type=="continuous") {
+    FALSE
+  } else {
+    stop("Value for `type=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
   }
+
+  if(discrete==TRUE){
+    x <- frank(x,ties.method = "dense")
+  }
+
+  colChain <- postpadChar(colChain,9,"ff")
+  c <- colHexToDec(colChain) %>%
+    apply( . , 2 , function(c) interpolate( x %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
+    round %>%
+    colDecToHex()
+
+  if(show==TRUE){
+    if(discrete==TRUE){
+      showPalettes(c[order(x)] %>% unique)
+    } else {
+      showPalettes(colChain,100)
+    }
+
+  }
+
   c
 }
 
 
+showPalettes <- function(colPalettes,gradientN=NULL){
 
+  if(is.character(colPalettes)){
+    colPalettes <- list(colPalettes)
+  }
+  span <- sapply(colPalettes,length)%>%max
+  bdr <- if(!is.null(gradientN)){NA}else{"#000000FF"}
+  null_plot(0:1,c(0,length(colPalettes)),yaxt="n",xaxt="n")
+  l_ply(seq_along(colPalettes), function(j) {
+    #dev j <- 1; i <- 2
+    if(is.null(gradientN)){
+      colPalette <- colPalettes[[j]]
+      n <- length(colPalette)
+    } else {
+      colPalette <- makePalette(colPalettes[[j]],gradientN)
+      n <- gradientN
+    }
+    width <- 1/n
+    l_ply(1:n,function(i){
+      rect(
+        (i-1)*width,(j-0.7),
+        i*width    ,(j-0.3),
+        border=bdr,
+        col=colPalette[i]
+      )
+    })
+    text(0,j,labels=names(colPalettes)[j],pos=4)
+  })
 
-
+}
 
 
 
@@ -368,15 +414,4 @@ consensusSeq <- function(alnSeqDT,seqId="unnamed_consensus_sequence"){
   )
 }
 
-#' @export
-scaleToCols <- function(x,cols){
-  selCols_i <- x %scale_between% c(1,length(cols)) %>% round
-  cols[selCols_i]
-}
 
-#' @export
-discreteToCols <- function(x,cols){
-  xx <- frank(x,ties.method = "dense")
-  selCols_i <- xx %scale_between% c(1,length(cols)) %>% round
-  cols[selCols_i]
-}

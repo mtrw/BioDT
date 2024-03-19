@@ -15,7 +15,6 @@ makeValidator <- function(validatorSpecs,wholeObjectValidatorFun=NULL){
       { colValidatorFun[[1]](validateMe[,get(colName)]) }
     ), by=.(idx) ]
 
-
     # Whole object validaton
     if( !is.null(wholeObjectValidatorFun) ){
       if( !wholeObjectValidatorFun(validateMe) )                                    { if(error==TRUE){ pstop("Column ",vS[i]$colName," failed validation function ",deparse(substitute(wholeObjectValidatorFun))); return(FALSE) }    else {return(FALSE)} }
@@ -35,21 +34,19 @@ makeValidator <- function(validatorSpecs,wholeObjectValidatorFun=NULL){
 
 
 
+
 #' @export
 trueFun <- function(x){TRUE}
 
 
 #' @export
 isBehaved <- function(x){
-  !is.na(x) & !is.nan(x) & !is.infinite(x)
+  all(!is.na(x) & !is.nan(x) & !is.infinite(x))
 }
 
 #' @export
 isBehavedPositive <- function(x){
-  browser()
-  print("RUNNING ON")
-  print(x)
-  isBehaved(x) & x>0
+  all(isBehaved(x) & x>0)
 }
 
 #' @export
