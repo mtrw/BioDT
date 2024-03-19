@@ -6,7 +6,7 @@ seq_valSpecs <- data.table(
 
 seqFname_valSpecs <- data.table(
   colName = c("seqFname"),
-  colClasse = c("character"),
+  colClass = c("character"),
   colValidatorFun = c(isBehaved)
 )
 
@@ -67,6 +67,12 @@ hasMinMaxProductSize_valSpecs <- data.table(
 
 
 hasInternalFlag_valSpecs <- data.table(
+  colName = c("internal"),
+  colClass = c("logical"),
+  colValidatorFun = isBehaved
+)
+
+optCols_valSpecs <- data.table(
   colName = c("internal"),
   colClass = c("logical"),
   colValidatorFun = isBehaved

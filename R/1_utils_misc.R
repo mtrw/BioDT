@@ -4,85 +4,13 @@ ce <- function(...){
 }
 
 #' @export
-isBehaved <- function(x){
-  !is.na(x) & !is.nan(x) & !is.infinite(x)
-}
-
-#' @export
-isBehavedPositive <- function(x){
-  isBehaved(x) & x>0
-}
-
-#' @export
 pstop <- function(...){
   stop(paste0(...))
 }
 
-#' @export
-trueFun <- function(x){TRUE}
 
 #' @export
-makeValidator <- function(validatorSpecs,wholeObjectValidatorFun=NULL){
-  vS <- copy(validatorSpecs)
-  #valspecs has three cols: colName(character), colClasses(character), colValidatorFuns(list(function(x),function(x),...))
-  function(validateMe,error=T){
-    if(!is.data.table(validateMe))                                                { if(error==TRUE){ pstop("object must be a data.table"); return(FALSE) }                                                                        else {return(FALSE)} }
-    sapply(1:nrow(vS),function(i){
-      if(! vS[i]$colName %in% colnames(validateMe))                               { if(error==TRUE){ pstop("Column ",vS[i]$colName," not found"); return(FALSE) }                                                                 else {return(FALSE)} }
-      if(! class(validateMe[,get(vS[i]$colName)])==vS[i]$colClass)                { if(error==TRUE){ pstop("Column ",vS[i]$colName," must be of class ",vS[i]$colClass); return(FALSE) }                                          else {return(FALSE)} }
-      if(! all(vS[i]$colValidatorFun[[1]](validateMe[,get(vS[i]$colName)])))      { if(error==TRUE){ pstop("Column ",vS[i]$colName," failed validation function ",deparse(substitute(vS[i]$colValidatorFun))); return(FALSE) }    else {return(FALSE)} }
-      if(!is.null(wholeObjectValidatorFun)){
-        if(!wholeObjectValidatorFun(validateMe))                                  { if(error==TRUE){ pstop("Column ",vS[i]$colName," failed validation function ",deparse(substitute(wholeObjectValidatorFun))); return(FALSE) }    else {return(FALSE)} }
-      }
-      TRUE
-    }) %>% all
-  }
-}
-
-#' @export
-containsWhitespace <- function(x){
-  all(grepl("[[:space:]]",x))
-}
-
-#' @export
-callLastz <- function(
-  binPath,
-  sFile,
-  sSubset,
-  sRange,qFile,
-  qSubset,
-  qRange,
-  outFmtArgs,
-  outFmtColNames=c("sSeqId","sStart","sEnd","sLength","sStrand","qSeqId","qStart","qEnd","qLength","qStrand","pctId","pctId_noGaps"),
-  otherArgs="",
-  showCmd=FALSE
-){
-  # binPath=system("which lastz",intern=T)
-  # sFile="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
-  # sSubset="Btr1_like_b_5_Morex_Btr1_like_b1"
-  # sRange=c(1,450)
-  # qFile="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
-  # qSubset="Btr1_functional_Morex"
-  # qRange=c(5,500)
-  # outFmtArgs = "general:name1,start1,end1,length1,strand1,name2,start2,end2,length2,strand2,id%,blastid%"
-  # outFmtColNames=c("sSeqId","sStart","sEnd","sLength","sStrand","qSeqId","qStart","qEnd","qLength","qStrand","pctId","pctId_noGaps")
-  # otherArgs=""
-
-  sSubsetArg <- if(!is.null(sSubset)){paste0("\\[subset=<(echo \"",sSubset,"\")\\]")}else{""}
-  qSubsetArg <- if(!is.null(qSubset)){paste0("\\[subset=<(echo \"",qSubset,"\")\\]")}else{""}
-  sRangeArg  <- if(!is.null(sRange)){paste0("\\[",sRange[1],"..",sRange[2],"\\]")}else{""}
-  qRangeArg  <- if(!is.null(qRange)){paste0("\\[",qRange[1],"..",qRange[2],"\\]")}else{""}
-
-  cmd <- paste0(binPath," ",sFile,sSubsetArg,sRangeArg," ",qFile,qSubsetArg,qRangeArg," --format=",outFmtArgs," ",otherArgs)#,"\["sSubset,sRange,qFile,qSubset,qRange,outFmtArgs,otherArgs)
-  if(showCmd==TRUE){ ce(cmd) }
-  fread(cmd=cmd,col.names=outFmtColNames)
-}
-
-
-
-#RENAME SOON
-#' @export
-filename_nopath_noext <- function(f,newPath="",newExt=""){
+filenameNopathNoext <- function(f,newPath="",newExt=""){
   sub("\\..*","",sub(".*[\\/]","",f)) %>% paste0(newPath,.,newExt)
 }
 
@@ -116,13 +44,6 @@ swap <- function(vec,matches,names,na.replacement=NA){
   vec
 }
 
-# Reverse complement a text DNA sequence.
-# Does not yet do all IUPAC codes.
-#rc(c("AAAAAC","AgCtaGcTxxxx----agcT"))
-#' @export
-rc <- function(x){
-  stringi::stri_reverse(x) %>% stringi::stri_trans_char("acgtACGT","tgcaTGCA")
-}
 
 # Test a blast DB exists
 # `root` is typically (e.g.) "my_subject.fasta"
@@ -149,32 +70,6 @@ nu <- function(x){
   sum(!duplicated(x))
 }
 
-# Print seqs as if an alignment
-# Give it strings in (e.g.) AAG-AT / A-GCAT format. s1[1] will align with s2[1], etc
-# Coords are simple alignment positions
-# If s2 is NULL, will "multiple align" all s1s
-#' @export
-printAln <- function(s1,s2=NULL){
-  w <- options()$width
-  l <- stri_length(s1[1])
-  for(i in seq(1,l,by=w)){
-    cat("[",i,"] \n")
-    for(i_Aln in 1:(length(s1)-1)){
-      cat(substr(s1[i_Aln],i,min(i+w,l)),"\n")
-      for(j in i:min(i+w,l)){
-        if((substr(s1[i_Aln],j,j)==substr(s1[i_Aln+1],j,j)) & substr(s1[i_Aln],j,j)!="-"){
-          cat("|")
-        } else {
-          cat(" ")
-        }
-      }
-      cat("\n")
-    }
-    cat(substr(s1[length(s1)],i,min(i+w,l)),"\n")
-    cat("\n\n")
-  }
-}
-#printAln(c("aagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgta","aagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgta","aagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgta","aagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgtaaagtcgta"))
 
 # ldply but a data.table returns
 #' @export
@@ -184,10 +79,8 @@ ldtply <- function(...){
 
 
 
-
-
 #' @export
-gridApplyDT <- function(dtx,dty=NULL,distFun,nameColx=NULL,nameColy=NULL,symmetrical=FALSE){
+gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL,symmetrical=FALSE){
   namesx <- if(!is.null(nameColx)){
     dtx[,get(nameColx)]
   } else {
@@ -208,11 +101,11 @@ gridApplyDT <- function(dtx,dty=NULL,distFun,nameColx=NULL,nameColy=NULL,symmetr
   }
   xlen <- nrow(dtx)
   ylen <- nrow(dty)
-  om <- matrix(as(NA,class(distFun(dtx[1,],dty[2,]))),nrow=xlen,ncol=ylen,dimnames=list(namesx,namesy))
+  om <- matrix(as(NA,class(FUN(dtx[1,],dty[2,]))),nrow=xlen,ncol=ylen,dimnames=list(namesx,namesy))
   l_ply(1:xlen,function(i_x){
     l_ply(1:if(symmetrical==TRUE){i_x}else{ylen},function(i_y){
       #ce("ix:",i_x,"\tiy:",i_y)
-      om[i_x,i_y] <<- distFun(dtx[i_x,],dty[i_y])
+      om[i_x,i_y] <<- FUN(dtx[i_x,],dty[i_y])
     })
   })
   if(symmetrical==TRUE){
@@ -221,23 +114,6 @@ gridApplyDT <- function(dtx,dty=NULL,distFun,nameColx=NULL,nameColy=NULL,symmetr
   om
 }
 
-
-# CHANGE NAME TO SOMETHING MORE SENSIBLE SOON
-#' @export
-alnGetClumps <- function(alnDT,dist,distCutoff=1e3L,hclustAlgorithm="single"){ # CHANGE TO COORDS GET CLUMPS AND BUILD IN aln2coords CONVERSION!!!
-#alnDT <- alnRph12toPgF; distCutoff <- 1e4; nameColx = "hitId"; hclustAlgorithm="single"
-  alnDT <- copy(alnDT)
-  clumps <- alnDT[,{
-    #debugonce(gridApplyDT)
-    dm <- gridApplyDT(dtx=.SD,distFun=function(x,y){ min( abs(y$sStart-x$sEnd) , abs(x$sStart-y$sEnd) ) },symmetrical=TRUE) %>% as.dist()
-    .(
-      clump = hclust(dm,method=hclustAlgorithm) %>% cutree(h=distCutoff),
-      sStart,
-      sEnd
-    )
-  },by=.(sSeqId)]
-  clumps[,.(span=diff(range(c(sStart,sEnd))),nAlns=.N,start=min(c(sStart,sEnd)),end=max(c(sStart,sEnd))),by=.(sSeqId,clump)]
-}
 
 #' @export
 pmean2 <- function(x,y){
