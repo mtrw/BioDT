@@ -305,7 +305,7 @@ applyPalette <- function(x,colChain,type="guess",show=F){ # colours in the palet
   c
 }
 
-
+#' @export
 showPalettes <- function(colPalettes,gradientN=NULL){
 
   if(is.character(colPalettes)){
