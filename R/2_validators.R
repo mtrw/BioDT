@@ -1,31 +1,31 @@
 #' @export
-hasSeqFname <- makeValidator(seqFname_valSpecs)
+has_seqFname <- makeValidator( "has_seqFname" , c("seqFname") )
 #' @export
-hasSeqId <- makeValidator(hasSeqId_valSpecs)
+has_SeqId <- makeValidator( "has_seqId" , c("seqId") )
 #' @export
-hasStrand <- makeValidator(hasStrand_valSpecs)
+has_strand <-makeValidator( "has_strand" , c("strand") )
 #' @export
-hasName <- makeValidator(hasName_valSpecs)
+has_name <- makeValidator( "has_name" , c("name") )
 #' @export
-hasScore <- makeValidator(hasScore_valSpecs)
+has_score <- makeValidator( "has_score" , c("score") )
 #' @export
-hasStartEnd <- makeValidator(hasStartEnd_valSpecs)
+has_start_end <- makeValidator( "has_start_end" , c("start","end") )
 #' @export
-isSeqDT <- makeValidator(seq_valSpecs)
+is_seqDT <- makeValidator( "is_seqDT" , c("seqId","seq") )
 #' @export
-isSeqDT_withSeqFname <- function(validateMe,...){ isSeqDT(validateMe,...) & hasSeqFname(validateMe,...) }
+is_seqDT_with_seqFname <- makeValidator( "is_seqDT_with_seqFname" , c("seqId","seq","seqFname") )
 #' @export
-isCoordDT <- makeValidator(coord_valSpecs,function(coordDT){coordDT[,all(start<=end)]})
+is_coordDT <- makeValidator( "is_coordDT" , c("seqId","start","end") )
 #' @export
-isCoordDT_outputsFileStrand <- function(validateMe,...){ isCoordDT(validateMe,...) & hasScore(validateMe,...) & hasName(validateMe,...) & hasStrand(validateMe,...) }
+has_minSize_maxSize <- makeValidator( "has_minSize_maxSize" , c("minSize","maxSize") )
 #' @export
-hasMinMaxSize <- makeValidator(hasMinMaxSize_valSpecs)
+has_optimalSize <- makeValidator( "has_optimalSize" , c("optimalSize") )
 #' @export
-hasOptimalSize <- makeValidator(hasOptimalSize_valSpecs)
+has_internal <- makeValidator( "has_internal" , c("internal") )
 #' @export
-hasInternalFlag <- makeValidator(hasInternalFlag_valSpecs)
+has_minProductSize <- makeValidator( "has_minProductSize" , c("productMinSize") )
 #' @export
-hasMinMaxProductSize <- makeValidator(hasMinMaxProductSize_valSpecs)
+has_maxProductSize <- makeValidator( "has_maxProductSize" , c("productMaxSize") )
 
 
 

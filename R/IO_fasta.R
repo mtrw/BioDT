@@ -54,7 +54,7 @@ writeFasta <- function(
   gzip = F,
   nameCol = "seqId"
 ){
-  isSeqDT(fasta)
+  is_seqDT(fasta)
   gzExt <-   if(gzip==TRUE){".gz"}else{""}
   if(is.null(fastaFname)){fastaFname <- paste0(deparse(substitute(fasta)),".fasta",gzExt)}
   fileCon <- if(gzip==TRUE){gzfile(fastaFname,open="w")}else{file(fastaFname,open="w")}

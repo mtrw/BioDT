@@ -3,11 +3,6 @@ ce <- function(...){
   cat(paste0(...,"\n"), sep='', file=stderr()) %>% eval(envir = globalenv() ) %>% invisible()
 }
 
-#' @export
-pstop <- function(...){
-  stop(paste0(...))
-}
-
 
 #' @export
 filenameNopathNoext <- function(f,newPath="",newExt=""){
@@ -22,6 +17,12 @@ null_plot <- function(x,y,xlab=NA,ylab=NA,revx=F,revy=F,...){
   if(revx==T){ xl <- rev(xl) }
   if(revy==T){ yl <- rev(yl) }
   plot(NULL,xlim=xl,ylim=yl,xlab=xlab,ylab=ylab,...)
+}
+
+# For a list of lists, get item sliceIdx (name or number) from each, return as vector
+#' @export
+sliceList <- function(list,sliceIdx){
+  sapply(list,function(li){li[[sliceIdx]]})
 }
 
 #' @export
@@ -161,16 +162,16 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 MSA <- function(seqDT,method="ClustalOmega",...){
   require(msa)
   require(Biostrings)
+  is_seqDT(seqDT,objName = deparse(substitute(seqDT)))
 
 
-  data.table(
-    seqId=seqDT$seqId,
-    alnSeq=seqDT$seq %>%
+  seqDT[,alnSeq:={
+    seq %>%
       Biostrings::DNAStringSet() %>%
       msa::msa(method=method,order="input",...) %>%
       msaConvert(type = "seqinr::alignment") %>%
       `[[`("seq")
-  )
+  }][]
 }
 
 #' @export
@@ -253,23 +254,6 @@ makePalette <- function(colChain=NULL,n=100L,setAlpha="ff",show=FALSE){ # An eve
   if(show==TRUE) { showPalettes(c) }
   c
 }
-
-#' @export
-palettePresets <- list(
-    wheel     = c("#d41313","#f7760c","#e3c607","#51a321","#0fbfae","#0f3fa6","#871b53"),
-    mclaren       = c("#232526","#00daef","#fa870c"),
-    mclaren2       = c("#030506","#fa870c"),
-    ferrari   = c("#151515","#f02929"),
-    mercedes      = c("#191919","#76dfc6","#d0d0d0"),
-    redbull        = c("#ffa800","#141823","#fe0b13"),
-    alphatauri        = c("#0b2945","#f5f8ff","#dd1010"),
-    RB             = c("#0a06b9","#e7e6eb","#d30303"),
-    astonmartin        = c("#02716c","#e7f1f6","#040300"),
-    alfaromeo        = c("#3e373e","#eff0f2","#cd0a24"),
-    sauber        = c("#111f28","#00d312"),
-    alpine        = c("#fbfeff","#ed98dd","#1766e0ff","#000010"),
-    williams        = c("#113950","#032cc6","#04367e","#18fbfe")
-)
 
 #' @export
 applyPalette <- function(x,colChain,type="guess",show=F){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.

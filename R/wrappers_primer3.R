@@ -14,10 +14,10 @@ primer3 <- function(
 
 
   #browser()
-  itl        <- hasInternalFlag(seqDT,error=F)
-  opSize     <- hasOptimalSize(seqDT,error=F)
-  mmSize     <- hasMinMaxSize(seqDT,error=F)
-  mmProdSize <- hasMinMaxProductSize(seqDT,error=F)
+  itl        <- has_internal(seqDT,objName = deparse(substitute(seqDT)))
+  opSize     <- has_optimalSize(seqDT,objName = deparse(substitute(seqDT)))
+  mmSize     <- has_minSize_maxSize(seqDT,objName = deparse(substitute(seqDT)))
+  mmProdSize <- has_minProductSize(seqDT,objName = deparse(substitute(seqDT)))
 
 
   seqDT[,{

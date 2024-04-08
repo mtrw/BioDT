@@ -22,7 +22,7 @@ readBed<- function(
     if(saveFnames){ o[,bedFname:=fn] }
     o
   }) %>% setDT
-  if(!isCoordDT(out,error=F)){ stop("Resultant table does not pass validation. Check the input as at least three columns (seqId, start, end) with sensible entries.") }
+  if(!is_coordDT(out,"OUT_DT",croak=F)){ warning("Resultant table does not pass validation. Check the input as at least three columns (seqId, start, end) with sensible entries.") }
   return(out)
 }
 # fn <- bedFname <- bed6Fname
@@ -39,9 +39,9 @@ writeBed <- function(
   bedFname = NULL
 ){
   bedDT <- copy(bedDT)
-  isCoordDT(bedDT)
+  is_coordDT(bedDT,objName = deparse(substitute(bedDT)))
   bedDT[,end:=end+1L] # To "trad" bed coords
-  if(is.null(bedFname)){bedFname <- paste0(deparse(substitute(fasta)),".bed")}
+  if(is.null(bedFname)){ bedFname <- paste0(deparse(substitute(fasta)),".bed") }
   #CHOOSE ALL BED-VALID ROWS IN ORDER TO DO
   colNames <- c(  "seqId",     "start",   "end",     "name",      "score",   "strand",    "thickStart", "thickEnd", "itemRgb",   "blockCount", "blockSizes", "blockStarts", "bedFname")
   colClasses <- c("character", "numeric", "numeric", "character", "numeric", "character", "numeric",    "numeric",  "character", "integer",    "character",  "character",   "character")
@@ -52,7 +52,7 @@ writeBed <- function(
     chooseCol_i <- i
   }
   getColNames <- colNames[1:chooseCol_i]
-  ce("Attempting to include columns: ")
-  ce(getColNames)
+  ce("Included output columns: ", paste0(getColNames,collapse=", "))
+
   write.table(bedDT[,..getColNames],file=bedFname,col.names=F,row.names=F,sep="\t",quote=F)
 }

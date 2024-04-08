@@ -13,7 +13,7 @@
 blast <- function(
   subjectFname=NULL,
   queryFname=NULL,
-  subjectFastaDT=NULL,
+  subjectSeqDT=NULL,
   queryFastaDT=NULL,
   outFastaFname=NULL,
   program="blastn",
@@ -27,12 +27,8 @@ blast <- function(
   makeBlastDbBinary=system("which makeblastdb",intern=T)
 ){
 
-  if(length(subjectFname)>1){
-    stop("Woah there cowgirl! One subject file at a time please.")
-  }
-
-  cleanSfile <- F
-  cleanQfile <- F
+  makeSfile <- F
+  makeQfile <- F
 
   blTypeChar <- "n"
   blTypeShort <- "nucl"
@@ -41,21 +37,25 @@ blast <- function(
     blTypeShort <- "prot"
   }
 
-  if(is.null(subjectFname) & !is.null(subjectFastaDT)){
-    cleanSfile <- T
-    writeFasta(subjectFastaDT,subjectFname<-tempfile(fileext = ".fasta"))
+  if(is.null(subjectFname) & !is.null(subjectSeqDT)){
+    is_seqDT(subjectSeqDT,objName=deparse(substitute(subjectSeqDT)),croak=T)
+    makeSfile <- T
+    writeFasta(subjectSeqDT,subjectFname<-tempfile(fileext = ".fasta"))
   }
   if(is.null(queryFname) & !is.null(queryFastaDT)){
-    cleanQfile <- T
+    is_seqDT(queryFastaDT,objName=deparse(substitute(queryFastaDT)),croak=T)
+    makeQfile <- T
     writeFasta(queryFastaDT,queryFname<-tempfile(fileext = ".fasta"))
   }
 
-  if(!blastDBexists(subjectFname,typePrefix=blTypeChar)){
-    ce("Making nucleotide blastDB for ",subjectFname)
-    mcmd <- paste0(makeBlastDbBinary," -dbtype ",blTypeShort," -in ",subjectFname)
-    ce("\tRunning command: ",mcmd)
-    system(mcmd)
-  }
+  l_ply(subjectFname,function(sFn){
+    if(!blastDBexists(sFn,typePrefix=blTypeChar)){
+      ce("Making nucleotide blastDB for ",sFn)
+      mcmd <- paste0(makeBlastDbBinary," -dbtype ",blTypeShort," -in ",sFn)
+      ce("\tRunning command: ",mcmd)
+      system(mcmd)
+    }
+  })
 
   if(addAlignments==TRUE){
     outFmtArg %<>% paste(outFmtArg,c("sseq qseq"))
@@ -63,15 +63,26 @@ blast <- function(
     outputColClasses %<>% c("character","character")
   }
 
-  bcmd <- paste0(blastBinaryDir,"/",program," -query ",queryFname," -db ",subjectFname," -outfmt '",outFmtArg,"' ",moreBlastArgs)
-  ce("Running command: ",bcmd)
-  bl <- fread(cmd = bcmd,col.names=outputColNames,colClasses=outputColClasses)
+
+
+  bl <- ldtply(subjectFname,function(sFn){
+    tmp <- ldtply(queryFname,function(qFn){
+      bcmd <- paste0(blastBinaryDir,"/",program," -query ",qFn," -db ",sFn," -outfmt '",outFmtArg,"' ",moreBlastArgs)
+      ce("Running command: ",bcmd)
+      tmp <- fread(cmd = bcmd,col.names=outputColNames,colClasses=outputColClasses)
+      if(!makeQfile){ tmp[,queryFname:=qFn][] }
+      tmp
+    })
+    if(!makeSfile){ tmp[,subjectFname:=sFn][] }
+    tmp
+  })
+
   if(!is.null(outFastaFname)){
     write.table(bl,outFastaFname,row.names=F,sep="\t",quote=F)
   }
 
-  if(cleanSfile){unlink(Sys.glob(paste0(subjectFname,".*")))}
-  if(cleanQfile){unlink(subjectFname)}
+  if(makeSfile){unlink(Sys.glob(paste0(subjectFname,".*")))}
+  if(makeQfile){unlink(subjectFname)}
 
   bl
 }

@@ -1,33 +1,184 @@
 
+
 #' @export
-makeValidator <- function(validatorSpecs,wholeObjectValidatorFun=NULL){
+vTrueFun <- function(x=NULL){TRUE}
 
-  # dev
-  vS <- copy(validatorSpecs)[,idx:=1:.N][]
-    # dev vS <- hasStartEnd_valSpecs[,idx:=1:.N][]; wholeObjectValidatorFun<-startBeforeEnd; validateMe <- data.table(start=c(1L:5), end=c(1L:5) )
-  #valspecs has three cols: colName(character), colClasses(character), colValidatorFuns(list(function(x),function(x),...))
-  function(validateMe,error=T){
-    if( !is.data.table(validateMe) )                                                { if(error==TRUE){ pstop("object must be a data.table"); return(FALSE) }                                                                        else {return(FALSE)} }
-    if( is.null(vS$requisite) ) { vS[,requisite:=TRUE] }
-    vS[, c("exists","passClass","passColValidation"):=.(
-      colName %in% colnames(validateMe),
-      validateMe[,class(get(colName))]!=colClass,
-      { colValidatorFun[[1]](validateMe[,get(colName)]) }
-    ), by=.(idx) ]
+is.behaved <- function(x){
+  !is.na(x) & !is.nan(x) & !is.infinite(x)
+}
 
-    # Whole object validaton
-    if( !is.null(wholeObjectValidatorFun) ){
-      if( !wholeObjectValidatorFun(validateMe) )                                    { if(error==TRUE){ pstop("Column ",vS[i]$colName," failed validation function ",deparse(substitute(wholeObjectValidatorFun))); return(FALSE) }    else {return(FALSE)} }
+#' @export
+vIsBehaved <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values")}
+  all(is.behaved(x))
+}
+
+#' @export
+vIsBehavedIntlikeFloat <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be whole numbers (i.e. no decimals)")}
+  all(is.behaved(x) & (x%%1==0))
+}
+
+#' @export
+vIsBehavedPositiveIntlikeFloat <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be positive whole numbers (i.e. no decimals)")}
+  all(is.behaved(x) & (x%%1==0) & x>0)
+}
+
+#' @export
+vIsBehavedPositive <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be >0")}
+  all(is.behaved(x) & x>0)
+}
+
+#' @export
+vIsBehavedCommaSepInts <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a digit [0-9] or a comma (,)")}
+  all(is.behaved(x) & !grepl("[^[:digit:],:]",x))
+}
+
+#' @export
+vIsBehavedSimpleText <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a 'normal' letter, digit, or underscore")}
+  all(is.behaved(x) & x!="" & !grepl("[^[:alnum:]_:]",x))
+}
+
+vIsBehavedStrand <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all entries must be '+' or '-'")}
+  all(is.behaved(x) & x%in%c("+","-") )
+}
+
+#' @export
+vContainsWhitespace <- function(x=NULL){
+  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and values must not have any whitespace (spaces, tab characters, newlines etc.)")}
+  all(is.behaved(x) & grepl("[[:space:]]",x))
+}
+
+
+
+#' @export
+makeValidator <- function( specName, requiredCols ){
+
+  # One day export this data to a factory-factory?
+  colSpecList <- list(
+    seqId =           list( class="character" , valFun=vIsBehaved ), # Every 'valFun' function in this list must  return a text explanation if its `x` arg is NULL
+    sSeqId=           list( class="character" , valFun=vIsBehaved ),
+    qSeqId=           list( class="character" , valFun=vIsBehaved ),
+    seq =             list( class="character" , valFun=vIsBehaved ),
+    sSeq =            list( class="character" , valFun=vIsBehaved ),
+    qSeq =            list( class="character" , valFun=vIsBehaved ),
+    bedFname =        list( class="character" , valFun=vIsBehaved ),
+    fastaFname =      list( class="character" , valFun=vIsBehaved ),
+    seqFname =        list( class="character" , valFun=vIsBehaved ),
+    start =           list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    end =             list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    strand =          list( class="character" , valFun=vIsBehavedStrand ),
+    name =            list( class="character" , valFun=vIsBehavedSimpleText ),
+    score =           list( class="character" , valFun=vIsBehaved ),
+    minSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
+    maxSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
+    optimalSize =     list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
+    productMinSize =  list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
+    productMaxSize =  list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
+    internal =        list( class="character" , valFun=vIsBehaved ),
+    thickStart =      list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    thickEnd =        list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    itemRgb =         list( class="character" , valFun=vIsBehaved ),
+    blockCount =      list( class="integer" ,   valFun=vIsBehaved ),
+    blockSizes =      list( class="character" , valFun=vIsBehavedCommaSepInts ),
+    blockStarts =     list( class="character" , valFun=vIsBehavedCommaSepInts )
+  )
+
+  objSpecList <- list(
+    list( c("start","end") , function(vm){all(vm$start <= vm$end)} , "Values in the 'start' column must be smaller than or equal to values in 'end' column" ),
+    list( c("qStart","qEnd") , function(vm){all(vm$qStart >= vm$qEnd)} , "Values in the 'qStart' column must be smaller than or equal to values in 'qEnd' column" ),
+    list( c("sStart","sEnd","strand") , function(vm){ vm[,all(fifelse(sEnd<sStart,strand=="-",strand=="+"))] }  , "Where sEnd is less than sStart, this indicates the sequence is reversed in the coordinate system, and hence it should the value in strand should be \"-\"" )
+  )
+
+  if(any(!requiredCols %in% names(colSpecList))){stop("Cannot build validator: No information for requiredCols in colSpecList")}
+
+  #colSpecs <- colSpecList[requiredCols]
+  objSpecsli <- sapply(seq_len(length(objSpecList)),function(i){
+    all(objSpecList[[i]][[1]] %in% requiredCols)
+  })
+  objSpecs <- objSpecList[objSpecsli]
+
+  #dev library(data.table); validateMe = data.table(seqId="penis",seq=3.0,start=5,end=2); objName=deparse(substitute(validateMe)) ;requiredCols=c("seqId","start","end");croak=T
+  validator <- function(validateMe,objName=deparse(substitute(validateMe)),croak=FALSE){
+
+    if(any(!requiredCols %in% colnames(validateMe))){
+      if(croak){
+        drawConsoleLine()
+        ce("VALIDATION FAILED")
+        drawConsoleLine()
+        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tThe following columns are required but not present:")
+        cat(paste0(requiredCols[!requiredCols %in% colnames(validateMe)],collapse=", "),"\n")
+        drawConsoleLine()
+        stop("See validator output above")
+      } else {
+        return(FALSE)
+      }
     }
 
-    sapply(1:nrow(vS),function(i){
-      if(! vS[i]$colName %in% colnames(validateMe))                               { if(error==TRUE){ pstop("Column ",vS[i]$colName," not found"); return(FALSE) }                                                                 else {return(FALSE)} }
-      if(! class(validateMe[,get(vS[i]$colName)])==vS[i]$colClass)                { if(error==TRUE){ pstop("Column ",vS[i]$colName," must be of class ",vS[i]$colClass); return(FALSE) }                                          else {return(FALSE)} }
-      if(! all(vS[i]$colValidatorFun[[1]](validateMe[,get(vS[i]$colName)])))      { if(error==TRUE){ pstop("Column ",vS[i]$colName," failed validation function ",deparse(substitute(vS[i]$colValidatorFun))); return(FALSE) }    else {return(FALSE)} }
+    oc <- data.table(
+      Column_Name = union(requiredCols,colnames(validateMe))
+    )[,idx:=1L:.N][]
 
-      TRUE
-    }) %>% all
+    oc[,Required_Name:=Column_Name %in% requiredCols]
+    oc[,Reserved_Name:=Column_Name %in% names(colSpecList)]
+
+    oc[Reserved_Name==TRUE,c("Required_Class","Class","Pass"):={
+      # Column_Name = "seq"
+      rcl <- get(Column_Name,colSpecList)$class
+      cl <- validateMe[,class(get(Column_Name))]
+      p <- (rcl==cl) & get(Column_Name,colSpecList)$valFun( get(Column_Name,validateMe) )
+      .(rcl,cl,p)
+    },by=.(idx)]
+    oc[Reserved_Name==FALSE,Pass:=TRUE]
+    if(any(oc$Pass==FALSE)){
+      oc[Pass==FALSE,Messages:=get(Column_Name,colSpecList)$valFun(),by=.(idx)]
+    }
+
+    oc[,idx:=NULL]
+
+    if(any(oc$Pass!=TRUE)){
+      if(croak){
+        drawConsoleLine()
+        ce("VALIDATION FAILED")
+        drawConsoleLine()
+        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tSee `Messages` column for things to fix:")
+        print(oc)
+        drawConsoleLine()
+        stop("See validator output above")
+      } else {
+        return(FALSE)
+      }
+    }
+    wc <- ldtply(objSpecs,function(spec){
+      #browser()
+      data.table(
+        Pass = spec[[2]](validateMe),
+        Rule = spec[[3]]
+      )
+    })
+
+    if(any(wc$Pass!=TRUE)){
+      if(croak){
+        drawConsoleLine()
+        ce("VALIDATION FAILED")
+        drawConsoleLine()
+        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tSee `Rule` column for things to fix:")
+        print(wc)
+        drawConsoleLine()
+        stop("See validator output above")
+      } else {
+        return(FALSE)
+      }
+    }
+
+    return(TRUE)
   }
+  return(validator)
 }
 
 
@@ -35,26 +186,19 @@ makeValidator <- function(validatorSpecs,wholeObjectValidatorFun=NULL){
 
 
 
-#' @export
-trueFun <- function(x){TRUE}
 
 
-#' @export
-isBehaved <- function(x){
-  all(!is.na(x) & !is.nan(x) & !is.infinite(x))
-}
 
-#' @export
-isBehavedPositive <- function(x){
-  all(isBehaved(x) & x>0)
-}
 
-#' @export
-containsWhitespace <- function(x){
-  all(grepl("[[:space:]]",x))
-}
 
-#' @export
-startBeforeEnd <- function(x){
-  x[,all(start<=end)]
-}
+
+
+
+
+
+
+
+
+
+
+

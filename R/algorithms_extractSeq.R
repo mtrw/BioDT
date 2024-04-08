@@ -36,18 +36,15 @@ extractSeq <- function (
   if(!is.null(coordDT) & stranded==FALSE){
     coordDT[,strand:="+"]
   } else {
-    hasStrand(coordDT)
+    has_strand(coordDT)
   }
   if(!is.null(bedFname) & stranded==FALSE){
     strandedArg <- ""
   }
-  if(!is.null(coordDT) & stranded==TRUE){
-    if(!isCoordDT_outputsFileStrand(coordDT)){ stop("This bed-dt when exported will not output a score as it lacks column info for the first five requisite cols, thus strandedness cannot be applied. Yet. I will create an automated fix for this one day.") }
-  }
 
   if(!is.null(coordDT) & !is.null(seqDT)){ # All in DTs
-    isCoordDT(coordDT)
-    isSeqDT(seqDT)
+    is_coordDT(coordDT)
+    is_seqDT(seqDT)
     #return( extractSeqFastaDTBedDT(coordDT,seqDT,stranded=stranded) )
     warning("NOT YET IMPLEMENTED, EMAIL TIM! (Will go ahead and use a stupid method instead)")
   }
@@ -78,13 +75,4 @@ extractSeq <- function (
   if(killTfo){unlink(outFastaFname)}
 
   out
-}
-
-
-
-
-
-
-extractSeqFastaDTBedDT <- function(coordDT,seqDT,stranded){
-  warning("NOT YET IMPLEMENTED, EMAIL TIM! (Will go ahead and use a stupid method instead)")
 }
