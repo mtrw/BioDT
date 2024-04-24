@@ -81,8 +81,8 @@ blast <- function(
     write.table(bl,outFastaFname,row.names=F,sep="\t",quote=F)
   }
 
-  if(makeSfile){unlink(Sys.glob(paste0(subjectFname,".*")))}
-  if(makeQfile){unlink(subjectFname)}
+  #if(makeSfile){unlink(Sys.glob(paste0(subjectFname,".*")))}
+  #if(makeQfile){unlink(subjectFname)}
 
   bl
 }
