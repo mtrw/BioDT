@@ -25,11 +25,11 @@ readFai <- function( #read a fai file
 makeFai <- function( #make fai files
   fastaFname,  #fastaFname=c("/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta","/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta")
   faiFname=paste0(fastaFname,".fai"),
-  samtoolsBin=system("which samtools", intern=TRUE)
+  samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   stopifnot("FastaFname and faiFname must be the same length" = length(fastaFname)==length(faiFname))
   l_ply(1:length(fastaFname),function(i){
-    command <- paste0(samtoolsBin," faidx -o ",faiFname[i]," ",fastaFname[i])
+    command <- paste0(samtoolsBinary," faidx -o ",faiFname[i]," ",fastaFname[i])
     system(command)
   })
   return(faiFname)
@@ -46,10 +46,10 @@ makeFai <- function( #make fai files
 #' @export
 getFai <- function( #from a FASTA file straight into an R fai
     fastaFname,  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
-    samtoolsBin=system("which samtools", intern=TRUE)
+    samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   out <- ldply(fastaFname,function(fn){
-    command <- paste0(samtoolsBin," faidx -o /dev/stdout ",fn)
+    command <- paste0(samtoolsBinary," faidx -o /dev/stdout ",fn)
     fread(cmd=command,select=1:2,header=F,col.names=c("seqName","length"))
   }) %>% setDT
   return(out)

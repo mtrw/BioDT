@@ -1,5 +1,4 @@
 
-
 #' @export
 vTrueFun <- function(x=NULL){TRUE}
 
@@ -9,48 +8,48 @@ is.behaved <- function(x){
 
 #' @export
 vIsBehaved <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values")}
   all(is.behaved(x))
 }
 
 #' @export
 vIsBehavedIntlikeFloat <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be whole numbers (i.e. no decimals)")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be whole numbers (i.e. no decimals)")}
   all(is.behaved(x) & (x%%1==0))
 }
 
 #' @export
 vIsBehavedPositiveIntlikeFloat <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be positive whole numbers (i.e. no decimals)")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be positive whole numbers (i.e. no decimals)")}
   all(is.behaved(x) & (x%%1==0) & x>0)
 }
 
 #' @export
 vIsBehavedPositive <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be >0")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be >0")}
   all(is.behaved(x) & x>0)
 }
 
 #' @export
 vIsBehavedCommaSepInts <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a digit [0-9] or a comma (,)")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a digit [0-9] or a comma (,)")}
   all(is.behaved(x) & !grepl("[^[:digit:],:]",x))
 }
 
 #' @export
 vIsBehavedSimpleText <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a 'normal' letter, digit, or underscore")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a 'normal' letter, digit, or underscore")}
   all(is.behaved(x) & x!="" & !grepl("[^[:alnum:]_:]",x))
 }
 
 vIsBehavedStrand <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and all entries must be '+' or '-'")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all entries must be '+' or '-'")}
   all(is.behaved(x) & x%in%c("+","-") )
 }
 
 #' @export
 vContainsWhitespace <- function(x=NULL){
-  if(is.null(x)){return("Must not have NA, NAN, or Infinite values, and values must not have any whitespace (spaces, tab characters, newlines etc.)")}
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and values must not have any whitespace (spaces, tab characters, newlines etc.)")}
   all(is.behaved(x) & grepl("[[:space:]]",x))
 }
 
@@ -67,14 +66,20 @@ makeValidator <- function( specName, requiredCols ){
     seq =             list( class="character" , valFun=vIsBehaved ),
     sSeq =            list( class="character" , valFun=vIsBehaved ),
     qSeq =            list( class="character" , valFun=vIsBehaved ),
+    sAlnSeq =         list( class="character" , valFun=vIsBehaved ),
+    qAlnSeq =         list( class="character" , valFun=vIsBehaved ),
     bedFname =        list( class="character" , valFun=vIsBehaved ),
     fastaFname =      list( class="character" , valFun=vIsBehaved ),
     seqFname =        list( class="character" , valFun=vIsBehaved ),
     start =           list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
     end =             list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    sStart =          list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    sEnd =            list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    qStart =          list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
+    qEnd =            list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
     strand =          list( class="character" , valFun=vIsBehavedStrand ),
     name =            list( class="character" , valFun=vIsBehavedSimpleText ),
-    score =           list( class="character" , valFun=vIsBehaved ),
+    score =           list( class="numeric" ,   valFun=vIsBehaved ),
     minSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
     maxSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
     optimalSize =     list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
@@ -91,7 +96,7 @@ makeValidator <- function( specName, requiredCols ){
 
   objSpecList <- list(
     list( c("start","end") , function(vm){all(vm$start <= vm$end)} , "Values in the 'start' column must be smaller than or equal to values in 'end' column" ),
-    list( c("qStart","qEnd") , function(vm){all(vm$qStart >= vm$qEnd)} , "Values in the 'qStart' column must be smaller than or equal to values in 'qEnd' column" ),
+    list( c("qStart","qEnd") , function(vm){all(vm$qStart <= vm$qEnd)} , "Values in the 'qStart' column must be smaller than or equal to values in 'qEnd' column. Plus-to-minus mappings should be reflected by the subject coordinates having sEnd > sStart." ),
     list( c("sStart","sEnd","strand") , function(vm){ vm[,all(fifelse(sEnd<sStart,strand=="-",strand=="+"))] }  , "Where sEnd is less than sStart, this indicates the sequence is reversed in the coordinate system, and hence it should the value in strand should be \"-\"" )
   )
 
@@ -104,15 +109,16 @@ makeValidator <- function( specName, requiredCols ){
   objSpecs <- objSpecList[objSpecsli]
 
   #dev library(data.table); validateMe = data.table(seqId="penis",seq=3.0,start=5,end=2); objName=deparse(substitute(validateMe)) ;requiredCols=c("seqId","start","end");croak=T
-  validator <- function(validateMe,objName=deparse(substitute(validateMe)),croak=FALSE){
+  validator <- function(validateMe,objName=deparse(substitute(validateMe)),croak=FALSE,message=NULL){
 
     if(any(!requiredCols %in% colnames(validateMe))){
       if(croak){
         drawConsoleLine()
         ce("VALIDATION FAILED")
         drawConsoleLine()
-        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tThe following columns are required but not present:")
-        cat(paste0(requiredCols[!requiredCols %in% colnames(validateMe)],collapse=", "),"\n")
+        ce("Object `",objName,"` does not meet the specifications for a ",specName,":\n\tThe following columns are required but not present:")
+        ce(paste0(requiredCols[!requiredCols %in% colnames(validateMe)],collapse=", "),"\n")
+        if(argGiven(message)){ ce("Notes: ", message ) }
         drawConsoleLine()
         stop("See validator output above")
       } else {
@@ -127,26 +133,30 @@ makeValidator <- function( specName, requiredCols ){
     oc[,Required_Name:=Column_Name %in% requiredCols]
     oc[,Reserved_Name:=Column_Name %in% names(colSpecList)]
 
-    oc[Reserved_Name==TRUE,c("Required_Class","Class","Pass"):={
+    oc[Reserved_Name==TRUE,c("Required_Class","Class","Pass_Class","Pass_Column_Rules"):={
       # Column_Name = "seq"
       rcl <- get(Column_Name,colSpecList)$class
       cl <- validateMe[,class(get(Column_Name))]
-      p <- (rcl==cl) & get(Column_Name,colSpecList)$valFun( get(Column_Name,validateMe) )
-      .(rcl,cl,p)
+      pc <- (rcl==cl)
+      pr <- get(Column_Name,colSpecList)$valFun( get(Column_Name,validateMe) )
+
+      .(rcl,cl,pc,pr)
     },by=.(idx)]
-    oc[Reserved_Name==FALSE,Pass:=TRUE]
-    if(any(oc$Pass==FALSE)){
-      oc[Pass==FALSE,Messages:=get(Column_Name,colSpecList)$valFun(),by=.(idx)]
+    oc[Reserved_Name==FALSE,Pass_Class:=NA]
+    oc[Reserved_Name==FALSE,Pass_Column_Rules:=NA]
+    #oc[Reserved_Name==FALSE,Notes:="Column not subject to specifications."]
+    if(any(oc[Reserved_Name==TRUE,Pass_Class==FALSE | Pass_Column_Rules==FALSE])){
+      oc[Reserved_Name==TRUE & (Pass_Class==FALSE | Pass_Column_Rules==FALSE),Notes:=get(Column_Name,colSpecList)$valFun(),by=.(idx)]
     }
 
     oc[,idx:=NULL]
 
-    if(any(oc$Pass!=TRUE)){
+    if(any(oc[Reserved_Name==TRUE,Pass_Class==FALSE | Pass_Column_Rules==FALSE])){
       if(croak){
         drawConsoleLine()
         ce("VALIDATION FAILED")
         drawConsoleLine()
-        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tSee `Messages` column for things to fix:")
+        ce("Object `",objName,"` does not meet the specifications for a ",specName,":\n\tCheck type is correct and see `Notes` column for things to check:")
         print(oc)
         drawConsoleLine()
         stop("See validator output above")
@@ -157,17 +167,17 @@ makeValidator <- function( specName, requiredCols ){
     wc <- ldtply(objSpecs,function(spec){
       #browser()
       data.table(
-        Pass = spec[[2]](validateMe),
+        Pass_Table_Rule = spec[[2]](validateMe),
         Rule = spec[[3]]
       )
     })
 
-    if(any(wc$Pass!=TRUE)){
+    if(any(wc$Pass_Table_Rule!=TRUE)){
       if(croak){
         drawConsoleLine()
         ce("VALIDATION FAILED")
         drawConsoleLine()
-        ce("Object `",objName,"` does not meet the criteria for a ",specName,":\n\tSee `Rule` column for things to fix:")
+        ce("Object `",objName,"` does not meet the specifications for a ",specName,":\n\tSee `Rule` column for things to fix:")
         print(wc)
         drawConsoleLine()
         stop("See validator output above")

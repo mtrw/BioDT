@@ -3,6 +3,24 @@ ce <- function(...){
   cat(paste0(...,"\n"), sep='', file=stderr()) %>% eval(envir = globalenv() ) %>% invisible()
 }
 
+#' @export
+argGiven <- function(x){
+  !is.null(x)
+}
+#' @export
+argNotGiven <- function(x){
+  is.null(x)
+}
+
+#' @export
+pd <- function(x,add=F,bw="nrd0",plotMain=NA,...){
+  if(!add){
+    x %>% density(na.rm=TRUE,bw=bw) %>% plot(main=plotMain,...)
+  } else {
+    x %>% density(na.rm=TRUE,bw=bw) %>% lines(main=plotMain,...)
+  }
+}
+
 
 #' @export
 filenameNopathNoext <- function(f,newPath="",newExt=""){
@@ -182,40 +200,6 @@ drawConsoleLine <- function(){
 }
 
 
-#' @export
-colHexToDec <- function(col){
-  sapply(col,function(c){
-    strtoi(
-      paste0("0x",c(
-        substr(c,2,3),
-        substr(c,4,5),
-        substr(c,6,7),
-        substr(c,8,9)
-      )
-      )
-    )
-  }) %>% t
-}
-
-
-#' @export
-postpadChar <- function(x,len=2,pad="0"){
-  paste0(x,substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))))
-}
-
-#' @export
-prepadChar <- function(x,len=2,pad="0"){
-  paste0(substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))),x)
-}
-
-
-#' @export
-colDecToHex <- function(col){
-  apply(col,1,function(c){
-    paste0("#",paste0(as.hexmode(c) %>% prepadChar(2,"0"),collapse=""))
-  })
-}
-
 #scale a list of values to between two points, proportionally spaced as they were originally
 #rnorm(100) %>% scale_between(20,29) %>% pd
 #' @export
@@ -241,84 +225,6 @@ interpolate <- function(in_x,xs,ys){
     slope <- (ys[righti]-ys[righti-1])/(xs[righti]-xs[righti-1])
     ys[righti-1] + slope*(ix-xs[righti-1])
   })
-}
-
-#' @export
-makePalette <- function(colChain=NULL,n=100L,setAlpha="ff",show=FALSE){ # An evenly spaced palette interpolating the colChain
-  if(is.null(colChain)){ colChain <- palettePresets$wheel }
-  colChain <- postpadChar(colChain,9,setAlpha)
-  c <- colHexToDec(colChain) %>%
-    apply( . , 2 , function(c) interpolate( (1:n) %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
-    round %>%
-    colDecToHex()
-  if(show==TRUE) { showPalettes(c) }
-  c
-}
-
-#' @export
-applyPalette <- function(x,colChain,type="guess",show=F){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
-  discrete <- if(type=="guess"){
-    is.logical(x) | is.character(x)
-  } else if (type=="discrete") {
-    TRUE
-  } else if (type=="continuous") {
-    FALSE
-  } else {
-    stop("Value for `type=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
-  }
-
-  if(discrete==TRUE){
-    x <- frank(x,ties.method = "dense")
-  }
-
-  colChain <- postpadChar(colChain,9,"ff")
-  c <- colHexToDec(colChain) %>%
-    apply( . , 2 , function(c) interpolate( x %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
-    round %>%
-    colDecToHex()
-
-  if(show==TRUE){
-    if(discrete==TRUE){
-      showPalettes(c[order(x)] %>% unique)
-    } else {
-      showPalettes(colChain,100)
-    }
-
-  }
-
-  c
-}
-
-#' @export
-showPalettes <- function(colPalettes,gradientN=NULL){
-
-  if(is.character(colPalettes)){
-    colPalettes <- list(colPalettes)
-  }
-  span <- sapply(colPalettes,length)%>%max
-  bdr <- if(!is.null(gradientN)){NA}else{"#000000FF"}
-  null_plot(0:1,c(0,length(colPalettes)),yaxt="n",xaxt="n")
-  l_ply(seq_along(colPalettes), function(j) {
-    #dev j <- 1; i <- 2
-    if(is.null(gradientN)){
-      colPalette <- colPalettes[[j]]
-      n <- length(colPalette)
-    } else {
-      colPalette <- makePalette(colPalettes[[j]],gradientN)
-      n <- gradientN
-    }
-    width <- 1/n
-    l_ply(1:n,function(i){
-      rect(
-        (i-1)*width,(j-0.7),
-        i*width    ,(j-0.3),
-        border=bdr,
-        col=colPalette[i]
-      )
-    })
-    text(0,j,labels=names(colPalettes)[j],pos=4)
-  })
-
 }
 
 
@@ -398,4 +304,16 @@ consensusSeq <- function(alnSeqDT,seqId="unnamed_consensus_sequence"){
   )
 }
 
+#' @export
+franktd <- function(...){ frank(...,ties.method="dense") }
 
+
+#' @export
+postpadChar <- function(x,len=2,pad="0"){
+  paste0(x,substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))))
+}
+
+#' @export
+prepadChar <- function(x,len=2,pad="0"){
+  paste0(substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))),x)
+}

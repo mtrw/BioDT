@@ -1,7 +1,7 @@
 #' @export
 palettePresets <- list(
   wheel     = c("#d41313","#f7760c","#e3c607","#51a321","#0fbfae","#0f3fa6","#871b53"),
-  mclaren       = c("#232526","#00daef","#fa870c"),
+  mclaren       = c("#232526","#fa870c","#00daef"),
   mclaren2       = c("#030506","#fa870c"),
   ferrari   = c("#151515","#f02929"),
   mercedes      = c("#191919","#76dfc6","#d0d0d0"),

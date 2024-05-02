@@ -4,7 +4,7 @@
 \alias{getFai}
 \title{Create a .fai-flavoured data.table directly from a .fasta file}
 \usage{
-getFai(fastaFname, samtoolsBin = system("which samtools", intern = TRUE))
+getFai(fastaFname, samtoolsBinary = system("which samtools", intern = TRUE))
 }
 \arguments{
 \item{fastaFname}{A character vector. The .fasta filename(s). [no default]}

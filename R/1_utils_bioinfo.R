@@ -38,7 +38,7 @@ printAln <- function(s1,s2=NULL){
 
 # CHANGE NAME TO SOMETHING MORE SENSIBLE SOON
 #' @export
-alnGetClumps <- function(alnDT,dist,distCutoff=1e3L,hclustAlgorithm="single"){ # CHANGE TO COORDS GET CLUMPS AND BUILD IN aln2coords CONVERSION!!!
+alnGetClumps <- function(alnDT,distCutoff=1e3L,hclustAlgorithm="single"){ # CHANGE TO COORDS GET CLUMPS AND BUILD IN aln2coords CONVERSION!!!
   #alnDT <- alnRph12toPgF; distCutoff <- 1e4; nameColx = "hitId"; hclustAlgorithm="single"
   alnDT <- copy(alnDT)
   clumps <- alnDT[,{
@@ -52,3 +52,14 @@ alnGetClumps <- function(alnDT,dist,distCutoff=1e3L,hclustAlgorithm="single"){ #
   },by=.(sSeqId)]
   clumps[,.(span=diff(range(c(sStart,sEnd))),nAlns=.N,start=min(c(sStart,sEnd)),end=max(c(sStart,sEnd))),by=.(sSeqId,clump)]
 }
+
+#' @export
+He <- function(x, inclNAs = F){
+  if (inclNAs==F) {
+    x <- x[!is.na(x)]
+  }
+  t <- table(x,useNA = "ifany")
+  1-sum((t/sum(t))**2)
+}
+
+

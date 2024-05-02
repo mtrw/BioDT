@@ -7,7 +7,7 @@
 makeFai(
   fastaFname,
   faiFname = paste0(fastaFname, ".fai"),
-  samtoolsBin = system("which samtools", intern = TRUE)
+  samtoolsBinary = system("which samtools", intern = TRUE)
 )
 }
 \arguments{

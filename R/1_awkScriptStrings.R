@@ -91,7 +91,14 @@ aScriptPrimer3generic <- function(){
 
   }
 
-
-
   '"
 }
+
+aScriptFasta2tbl <- '{sub(/\\r/,"")} /^>/ { if(NR>1){printf("\\n")}; printf substr($1,2,length($0))" "; next; } 1 {printf $1}'
+
+aScriptCdhitClstr2tbl <- '/^>Cluster/ {c=$2; next}   {sub(">","",$3); sub("\\\\.\\\\.\\\\.$","",$3); print $3,c}'
+
+aScriptTrf2Tbl <- '/^@/ {n=substr($1,2); next} {print n,$0}'
+
+
+

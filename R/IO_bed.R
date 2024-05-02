@@ -54,5 +54,5 @@ writeBed <- function(
   getColNames <- colNames[1:chooseCol_i]
   ce("Included output columns: ", paste0(getColNames,collapse=", "))
 
-  write.table(bedDT[,..getColNames],file=bedFname,col.names=F,row.names=F,sep="\t",quote=F)
+  fwrite(bedDT[,..getColNames],file=bedFname,col.names=F,row.names=F,sep="\t",quote=F,scipen=999)
 }

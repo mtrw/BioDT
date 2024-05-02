@@ -11,6 +11,8 @@ has_score <- makeValidator( "has_score" , c("score") )
 #' @export
 has_start_end <- makeValidator( "has_start_end" , c("start","end") )
 #' @export
+has_sqSeqs <- makeValidator( "has_sqSeqs" , c("sAlnSeq","qAlnSeq") )
+#' @export
 is_seqDT <- makeValidator( "is_seqDT" , c("seqId","seq") )
 #' @export
 is_seqDT_with_seqFname <- makeValidator( "is_seqDT_with_seqFname" , c("seqId","seq","seqFname") )
@@ -26,7 +28,7 @@ has_internal <- makeValidator( "has_internal" , c("internal") )
 has_minProductSize <- makeValidator( "has_minProductSize" , c("productMinSize") )
 #' @export
 has_maxProductSize <- makeValidator( "has_maxProductSize" , c("productMaxSize") )
-
-
+#' @export
+is_alignmentDT <- makeValidator( "is_alignmentDT" , c("sSeqId","qSeqId","sStart","sEnd","qStart","qEnd") )
 
 
