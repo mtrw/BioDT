@@ -91,8 +91,7 @@ extractSeq <- function (
       stop(paste0("The requested column `",nameCol,"` does not exist in the coordinate table, which has these columns:",colnames(coordDT)))
     }
     coordDT[,name:=get(nameCol)]
-  }
-  if(!has_name(coordDT)){
+  } else if(!has_name(coordDT)){
     ce("Note: Column `name` not present in coordDT. Extracted sequences will be named using `seqId` column.")
     coordDT[,name:=seqId]
   }
