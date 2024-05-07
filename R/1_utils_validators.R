@@ -79,6 +79,9 @@ makeValidator <- function( specName, requiredCols ){
     qEnd =            list( class="numeric" ,   valFun=vIsBehavedPositiveIntlikeFloat ),
     strand =          list( class="character" , valFun=vIsBehavedStrand ),
     name =            list( class="character" , valFun=vIsBehavedSimpleText ),
+    fastaFname =      list( class="character" , valFun=vIsBehaved ),
+    sFastaFname =     list( class="character" , valFun=vIsBehaved ),
+    qFastaFname =     list( class="character" , valFun=vIsBehaved ),
     score =           list( class="numeric" ,   valFun=vIsBehaved ),
     minSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
     maxSize =         list( class="character" , valFun=vIsBehavedPositiveIntlikeFloat ),
@@ -192,6 +195,10 @@ makeValidator <- function( specName, requiredCols ){
 }
 
 
+#' @export
+hasCol <- function(dt,colName){
+  exists(colName,where=dt,inherits=FALSE)
+}
 
 
 

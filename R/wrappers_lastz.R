@@ -7,6 +7,9 @@ lastz <- function(
     querySeqDT=NULL,
     outFastaFname=NULL,
     addAlignments=FALSE,
+    addPctIdGaps=FALSE,
+    addNgaps=FALSE,
+    addColList=NULL,
     outFmtArg=NULL,
     outputColNames=NULL,
     outputColClasses=NULL,
@@ -36,6 +39,22 @@ lastz <- function(
     outputColNames %<>% c("sAlnSeq","qAlnSeq")
     outputColClasses %<>% c("character","character")
   }
+  if(addPctIdGaps==TRUE){
+    outFmtArg %<>% paste0(c(",id%"))
+    outputColNames %<>% c("pctId")
+    outputColClasses %<>% c("character")
+  }
+  if(addNgaps==TRUE){
+    outFmtArg %<>% paste0(c(",cgap"))
+    outputColNames %<>% c("nGaps")
+    outputColClasses %<>% c("integer")
+  }
+  for(l in addColList){
+    # FUTURE documentation / checks. Each list item is a list of 3: arg for lastz fmt string; name for R; class for R
+    outFmtArg %<>% paste0(",",l[[1]])
+    outputColNames %<>% l[[2]]
+    outputColClasses %<>% l[[3]]
+  }
 
   makeSfile <- F
   makeQfile <- F
@@ -61,7 +80,7 @@ lastz <- function(
       getFai(subjectFname,samtoolsBinary=samtoolsBinary)
     }
 
-    ldtply(sFai$seqName,function(ssName){ #sseq  # dev ssName<-sFai$seqName[1];
+    ldtply(sFai$seqId,function(ssName){ #sseq  # dev ssName<-sFai$seqId[1];
       ldtply(queryFname,function(qFn){ #qseqfile # dev qFn<-queryFname[1];
         qFaiFname <- paste0(queryFname,".fai")
         qFai <- if(file.exists(sFaiFname)){
@@ -70,7 +89,7 @@ lastz <- function(
           getFai(queryFname,samtoolsBinary=samtoolsBinary)
         }
 
-        ldtply(qFai$seqName,function(qsName){ #qseq # dev qsName<-qFai$seqName[1];
+        ldtply(qFai$seqId,function(qsName){ #qseq # dev qsName<-qFai$seqId[1];
           # align sseq in sseqfile to qseq in qseqfile
           #  ssName<-
           sSubsetArg <- paste0("\\[subset=<(echo \"",ssName,"\")\\]")
@@ -79,9 +98,8 @@ lastz <- function(
           ce(cmd)
           #fread(cmd=cmd,col.names=outputColNames)
           tmp <- fread(cmd=cmd,col.names=outputColNames,colClasses=outputColClasses)
-          if(!makeSfile){ tmp[,subjectFname:=sFn][] }
-          if(!makeQfile){ tmp[,subjectFname:=qFn][] }
-          #PROCESS DIRECTIONS, DELETE STRANDS
+          if(!makeSfile){ tmp[,sFastaFname:=sFn][] }
+          if(!makeQfile){ tmp[,qFastaFname:=qFn][] }
           tmp
         })
       })
@@ -89,11 +107,12 @@ lastz <- function(
   })
 
   if(makeBioDTOutput | forceBioDToutput){
-    if(argGiven(la$sAlnSeq)){ la[sStrand!=qStrand,sAlnSeq:=rc(sAlnSeq)] }
-    if(argGiven(la$qAlnSeq)){ la[sStrand!=qStrand,qAlnSeq:=rc(qAlnSeq)] }
-    if(argGiven(la$sStart) & argGiven(la$sEnd)){ la[sStrand!=qStrand,c("sStart","sEnd"):=.(sEnd,sStart)]  }
-    if(argGiven(la$sStrand)) { la[,sStrand:=NULL] }
-    if(argGiven(la$qStrand)) { la[,qStrand:=NULL] }
+    if(hasCol(la,"sAlnSeq")){ la[sStrand!=qStrand,sAlnSeq:=rc(sAlnSeq)] }
+    if(hasCol(la,"qAlnSeq")){ la[sStrand!=qStrand,qAlnSeq:=rc(qAlnSeq)] }
+    if(hasCol(la,"sStart") & hasCol(la,"sEnd")){ la[sStrand!=qStrand,c("sStart","sEnd"):=.(sEnd,sStart)]  }
+    if(hasCol(la,"sStrand")) { la[,sStrand:=NULL] }
+    if(hasCol(la,"qStrand")) { la[,qStrand:=NULL] }
+    if(hasCol(la,"pctId")) { la[,pctId:=as.numeric(sub("%","",pctId))] }
   }
 
   if(argGiven(outFastaFname)){

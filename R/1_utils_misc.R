@@ -1,4 +1,7 @@
 #' @export
+d.t <- function(...){data.table(...)}
+
+#' @export
 ce <- function(...){
   cat(paste0(...,"\n"), sep='', file=stderr()) %>% eval(envir = globalenv() ) %>% invisible()
 }
@@ -13,6 +16,11 @@ argNotGiven <- function(x){
 }
 
 #' @export
+isBehaved <- function(x){
+  !(is.na(x) | is.null(x) | is.infinite(x) | is.nan(x))
+}
+
+#' @export
 pd <- function(x,add=F,bw="nrd0",plotMain=NA,...){
   if(!add){
     x %>% density(na.rm=TRUE,bw=bw) %>% plot(main=plotMain,...)
@@ -20,6 +28,7 @@ pd <- function(x,add=F,bw="nrd0",plotMain=NA,...){
     x %>% density(na.rm=TRUE,bw=bw) %>% lines(main=plotMain,...)
   }
 }
+
 
 
 #' @export

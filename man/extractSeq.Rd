@@ -10,7 +10,7 @@ extractSeq(
   fastaFname = NULL,
   seqDT = NULL,
   outFastaFname = NULL,
-  stranded = TRUE,
+  stranded = FALSE,
   nameCol = NULL,
   bedToolsBin = system("which bedtools", intern = T)
 )

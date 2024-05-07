@@ -7,7 +7,7 @@ readFai <- function( #read a fai file
   faiFname  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
 ){
   out <- ldply(faiFname,function(fn){ #dev fn <- "/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta.fai"
-    fread(fn,select=1:2,header=F,col.names=c("seqName","length"))
+    fread(fn,select=1:2,header=F,col.names=c("seqId","seqLength"))
   }) %>% setDT
   return(out)
 }
@@ -49,8 +49,14 @@ getFai <- function( #from a FASTA file straight into an R fai
     samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   out <- ldply(fastaFname,function(fn){
-    command <- paste0(samtoolsBinary," faidx -o /dev/stdout ",fn)
-    fread(cmd=command,select=1:2,header=F,col.names=c("seqName","length"))
+    if(file.exists(faiFn <- paste0(fastaFname,".fai"))){
+      warning(paste0("Found a file ",faiFn,". Will attempt to read fai info from that."))
+      readFai(faiFn)
+    } else {
+      command <- paste0(samtoolsBinary," faidx -o /dev/stdout ",fn)
+      fread(cmd=command,select=1:2,header=F,col.names=c("seqId","seqLength"))
+    }
   }) %>% setDT
   return(out)
 }
+

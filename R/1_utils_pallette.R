@@ -27,7 +27,7 @@ makePalette <- function(colChain=palettePresets$wheel,n=100L,setAlpha="ff",show=
     apply( . , 2 , function(c) interpolate( (1:n) %scale_between% c( 1 , length(colChain)) , 1:length(c) , c ) ) %>%
     round %>%
     colDecToHex()
-  if(show==TRUE) { showPalettes(c) }
+  if(show==TRUE) { showPalettes(c,n) }
   c
 }
 
@@ -43,27 +43,29 @@ applyPalette <- function(x,colChain=palettePresets$wheel,type="guess",show=F){ #
     stop("Value for `type=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
   }
 
+  isBehx <- isBehaved(x)
+  xc <- x[isBehx]#x, cleaned
+
   if(discrete==TRUE){
-    x <- frank(x,ties.method = "dense")
+    xc <- frank(xc,ties.method = "dense")
   }
 
   colChain <- postpadChar(colChain,9,"ff")
   c <- colChain %>%
     colHexToDec %>%
-    apply( . , 2 , function(c) interpolate( x %scale_between% c( 1 , length(c)) , 1:length(c) , c ) ) %>%
+    apply( . , 2 , function(c) interpolate( xc %scale_between% c( 1 , length(c)) , 1:length(c) , c ) ) %>%
     round %>%
     colDecToHex()
 
   if(show==TRUE){
     if(discrete==TRUE){
-      showPalettes(c[order(x)] %>% unique)
+      showPalettes(c[order(xc)] %>% unique)
     } else {
-      showPalettes(colChain,100)
+      showPalettes(colChain,gradientN=if(discrete==TRUE){NULL}else{100L})
     }
-
   }
-
-  c
+  x[isBehx] <- c
+  x
 }
 
 #' @export

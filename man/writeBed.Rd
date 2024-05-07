@@ -4,7 +4,7 @@
 \alias{writeBed}
 \title{Write a bed file}
 \usage{
-writeBed(bedDT, bedFname = NULL)
+writeBed(coordDT, bedFname = NULL)
 }
 \arguments{
 \item{bedFname}{A character vector. The filename to write. If NULL will use the deparsed/substituted variable name given as bed [NULL]}

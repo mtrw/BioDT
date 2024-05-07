@@ -2,7 +2,7 @@
 #'
 #' @param fastaFname A character vector. The .fasta filenames to read. Calls awk. [no default]
 #' @param saveFnames Logical value. Include a fastaFname column in the output? [TRUE]
-#' @param namesOnly Logical value. If true, will return only the seqName column. Calls samtools faidx.
+#' @param namesOnly Logical value. If true, will return only the seqId column. Calls samtools faidx.
 #' @param awkBin Character value. Where to find awk [system("which awk", intern=TRUE)]
 #' @param gzipBin Character value. Where to find gzip. [system("which gzip", intern=TRUE)]
 #' @returns A data.table with .fasta flavour.
@@ -16,7 +16,7 @@ readFasta <- function(
     awkBinary=system("which awk", intern=TRUE)
 ){
   if(namesOnly){
-    getFai(fastaFname)[,.(seqName)]
+    getFai(fastaFname)[,.(seqId)]
   } else {
     tf <- tempfile(fileext=".tsv")
     out <- ldtply(fastaFname,function(fn){

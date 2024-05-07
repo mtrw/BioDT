@@ -71,10 +71,10 @@ blast <- function(
       bcmd <- paste0(blastBinaryDir,"/",program," -query ",qFn," -db ",sFn," -outfmt '",outFmtArg,"' ",moreBlastArgs)
       ce("Running command: ",bcmd)
       tmp <- fread(cmd = bcmd,col.names=outputColNames,colClasses=outputColClasses)
-      if(!makeQfile){ tmp[,queryFname:=qFn][] }
+      if(!makeQfile){ tmp[,qFastaFname:=qFn][] }
       tmp
     })
-    if(!makeSfile){ tmp[,subjectFname:=sFn][] }
+    if(!makeSfile){ tmp[,sFastaFname:=sFn][] }
     tmp
   })
 

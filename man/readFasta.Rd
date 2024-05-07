@@ -16,7 +16,7 @@ readFasta(
 
 \item{saveFnames}{Logical value. Include a fastaFname column in the output? [TRUE]}
 
-\item{namesOnly}{Logical value. If true, will return only the seqName column. Calls samtools faidx.}
+\item{namesOnly}{Logical value. If true, will return only the seqId column. Calls samtools faidx.}
 
 \item{awkBin}{Character value. Where to find awk [system("which awk", intern=TRUE)]}
 
