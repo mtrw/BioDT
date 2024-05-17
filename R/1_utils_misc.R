@@ -16,6 +16,10 @@ argNotGiven <- function(x){
 }
 
 #' @export
+printVecRows <- function(x){cat(paste(x,collapse="\n"))}
+
+
+#' @export
 isBehaved <- function(x){
   !(is.na(x) | is.null(x) | is.infinite(x) | is.nan(x))
 }

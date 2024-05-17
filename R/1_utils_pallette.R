@@ -32,7 +32,7 @@ makePalette <- function(colChain=palettePresets$wheel,n=100L,setAlpha="ff",show=
 }
 
 #' @export
-applyPalette <- function(x,colChain=palettePresets$wheel,type="guess",show=F){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
+applyPalette <- function(x,colChain=palettePresets$wheel,type="guess",show=F,alpha=NULL){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
   discrete <- if(type=="guess"){
     is.logical(x) | is.character(x)
   } else if (type=="discrete") {
@@ -57,6 +57,8 @@ applyPalette <- function(x,colChain=palettePresets$wheel,type="guess",show=F){ #
     round %>%
     colDecToHex()
 
+  if(argGiven(alpha)){ c <- alpha(c,alpha) }
+
   if(show==TRUE){
     if(discrete==TRUE){
       showPalettes(c[order(xc)] %>% unique)
@@ -64,6 +66,7 @@ applyPalette <- function(x,colChain=palettePresets$wheel,type="guess",show=F){ #
       showPalettes(colChain,gradientN=if(discrete==TRUE){NULL}else{100L})
     }
   }
+
   x[isBehx] <- c
   x
 }

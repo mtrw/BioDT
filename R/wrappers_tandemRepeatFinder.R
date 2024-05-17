@@ -15,7 +15,7 @@ tandemRepeatFinder <- function(
 ){
   # DEV #################
   # seqDT=NULL
-  # fastaFname=NULL
+  # fastaFname="/data/gpfs/projects/punim1869/users/mrabanuswall/playground/data/btr_btrLike_queries_Morex_GP.fasta"
   # trf_matchWeight=2L
   # trf_mismatchPenalty=7L
   # trf_indelPenalty=7L
@@ -62,16 +62,16 @@ tandemRepeatFinder <- function(
     " ", trf_indelProb[1],
     " ", trf_minScore,
     " ", trf_maxPeriod,
+    " -h ",
     " -ngs ",
     " | ",awkBinary," '",aScriptTrf2Tbl,"'"
   )
 
-  rpts <- fread(cmd=command,header=F,select=c(1:5,16),col.names = c("seqId_noSpace","start","end","nCopies","meanLength","repeatConsensusSeq"),colClasses = list(character=c(1,16),numeric=c(2,3,5),integer=4))[,repeatArrayLength:=abs((end-start)+1)]
+  rpts <- fread(cmd=command,header=F,select=c(1:5,15),col.names = c("seqId_noSpace","start","end","nCopies","meanLength","repeatConsensusSeq"),colClasses = list(character=c(1,15),numeric=c(2,3,5),integer=4))[,repeatArrayLength:=abs((end-start)+1)]
 
   unlink(tfFastaFname)
 
   return(rpts[seqDT_,on=.(seqId_noSpace)][,seqId_noSpace:=NULL][])
-  rpts[seqDT_,on=.(seqId_noSpace)][,seqId_noSpace:=NULL][]
 }
 
 

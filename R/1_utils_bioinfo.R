@@ -62,4 +62,7 @@ He <- function(x, inclNAs = F){
   1-sum((t/sum(t))**2)
 }
 
-
+#' #' @export
+# addStrand < function(alignmentDT){
+# Should go on coordDT, alignDT
+# }
