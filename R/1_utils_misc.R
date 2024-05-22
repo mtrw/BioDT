@@ -330,3 +330,37 @@ postpadChar <- function(x,len=2,pad="0"){
 prepadChar <- function(x,len=2,pad="0"){
   paste0(substr(rep(paste0(rep(pad,len),collapse=""),length(x)),rep(0,length(x)),(len-stringi::stri_length(x))),x)
 }
+
+
+#' @export
+dcast2matrix <- function(...){
+  tmp <- dcast(...)
+  rnames <- tmp[[1]]
+  #cnames <- colnames(tmp)[-1]
+  m <- as.matrix(tmp[,2:ncol(tmp)])
+  rownames(m) <- rnames
+  m
+}
+
+
+#' @export
+groupify <- function(x,nClasses=10){
+  x %scale_between% c(1,nClasses) %>% round %>% as.integer
+}
+
+#' @export
+same <- function(x){
+  nu(x)==1
+}
+
+#' @export
+#draw an arch
+arch <- function(start,end,bottom,top,n=100L,...){
+  d <- data.table(
+    x=cos(seq(0,pi,length.out=n)) %>% scale_between(start,end),
+    y=sin(seq(0,pi,length.out=n)) %>% scale_between(bottom,top)
+  )
+  lines(d$x,d$y,...)
+}
+# null_plot(-10:10,-10:10)
+# arch(-5,2,-4,4,col="red",lwd=4,lty=2)

@@ -4,12 +4,11 @@
 #' @returns A data.table with .fai flavour.
 #' @export
 readFai <- function( #read a fai file
-  faiFname  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
+  faiFname
 ){
-  out <- ldply(faiFname,function(fn){ #dev fn <- "/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta.fai"
-    fread(fn,select=1:2,header=F,col.names=c("seqId","seqLength"))
-  }) %>% setDT
-  return(out)
+  ldtply(faiFname,function(fn){
+    fread(fn,select=1:2,header=F,col.names=c("seqId","seqLength"))[,faiFname:=fn][]
+  })
 }
 
 
@@ -23,7 +22,7 @@ readFai <- function( #read a fai file
 #' Wrapper for samtools faidx
 #' @export
 makeFai <- function( #make fai files
-  fastaFname,  #fastaFname=c("/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta","/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta")
+  fastaFname,
   faiFname=paste0(fastaFname,".fai"),
   samtoolsBinary=system("which samtools", intern=TRUE)
 ){
@@ -45,7 +44,7 @@ makeFai <- function( #make fai files
 #' Calls samtools faidx
 #' @export
 getFai <- function( #from a FASTA file straight into an R fai
-    fastaFname,  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
+    fastaFname,
     samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   out <- ldply(fastaFname,function(fn){
