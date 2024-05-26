@@ -231,13 +231,15 @@ scale_between <- function(x,lower,upper){
 
 #' @export
 interpolate <- function(in_x,xs,ys){
-  sapply(in_x,function(ix){
-    #browser()
-    righti <- which(cumsum(xs>=ix)==1)
-    if(ix==xs[righti]){return(ys[righti])}
+  out <- rep(NA_real_,length(in_x))
+  in_x[!in_x %between% range(xs)] <- NA
+  for(i in which(!is.na(in_x))){
+    righti <- which(cumsum(xs>=in_x[i])==1)
+    if(in_x[i]==xs[righti]){ out[i] <- ys[righti]; next; }
     slope <- (ys[righti]-ys[righti-1])/(xs[righti]-xs[righti-1])
-    ys[righti-1] + slope*(ix-xs[righti-1])
-  })
+    out[i] <- ys[righti-1] + slope*(in_x[i]-xs[righti-1])
+  }
+  out
 }
 
 
