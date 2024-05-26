@@ -148,7 +148,7 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL,symmetrical
 
 #' @export
 pmean2 <- function(x,y){
-  x+y/2
+  (x+y)/2
 }
 
 #' @export
@@ -347,6 +347,23 @@ dcast2matrix <- function(...){
 groupify <- function(x,nClasses=10){
   x %scale_between% c(1,nClasses) %>% round %>% as.integer
 }
+
+#' @export
+groupifyByBoundaries <- function(x,boundaries,values=NULL){
+  if(is.null(values)){values=0:length(boundaries)+1}
+  if(length(values)!=(length(boundaries)+1)){ stop("Values must be provided for each boundary gap, and above/below the limits") }
+  if(is.unsorted(boundaries)){ stop("Boundaries in ascending order please!") }
+  o <- x
+  o[x<first(boundaries)] <- first(values)
+  o[x>=last(boundaries)] <- last(values)
+  if(length(boundaries)>1){
+    for(i in 1:(length(boundaries)-1)){
+      o[x >= boundaries[i] & x < boundaries[i+1]] <- values[i+1]
+    }
+  }
+  return(o)
+}
+
 
 #' @export
 same <- function(x){

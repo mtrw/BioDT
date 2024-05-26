@@ -12,9 +12,9 @@ rc <- function(x){
 # Coords are simple alignment positions
 # If s2 is NULL, will "multiple align" all s1s
 #' @export
-printAln <- function(s1,s2=NULL){
+printAln <- function(s1){
   w <- options()$width
-  l <- stri_length(s1[1])
+  l <- nchar(s1[1])
   for(i in seq(1,l,by=w)){
     cat("[",i,"] \n")
     for(i_Aln in 1:(length(s1)-1)){
