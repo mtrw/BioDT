@@ -64,7 +64,7 @@ tandemRepeatFinder <- function(
     " ", trf_maxPeriod,
     " -h ",
     " -ngs ",
-    " | ",awkBinary," '",aScriptTrf2Tbl,"'"
+    " | ",awkBinary," '",aScriptTrf2tbl,"'"
   )
 
   rpts <- fread(cmd=command,header=F,select=c(1:5,15),col.names = c("seqId_noSpace","start","end","nCopies","meanLength","repeatConsensusSeq"),colClasses = list(character=c(1,15),numeric=c(2,3,5),integer=4))[,repeatArrayLength:=abs((end-start)+1)]

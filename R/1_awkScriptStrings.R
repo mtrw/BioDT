@@ -1,4 +1,4 @@
-aScriptPrimer3generic <- function(){
+aScriptPrimer3generic <- function(){ #why is this a function? pfft
   "'
 
   BEGIN{
@@ -98,7 +98,7 @@ aScriptFasta2tbl <- '{sub(/\\r/,"")} /^>/ { if(NR>1){printf("\\n")}; printf subs
 
 aScriptCdhitClstr2tbl <- '/^>Cluster/ {c=$2; next}   {sub(">","",$3); sub("\\\\.\\\\.\\\\.$","",$3); print $3,c}'
 
-aScriptTrf2Tbl <- '/^@/ {n=substr($1,2); next} {print n,$0}'
+aScriptTrf2tbl <- '/^@/ {n=substr($1,2); next} {print n,$0}'
 
-
+aScriptUclust2tbl <- '$1=="H" || $1=="C" {print $9"\\t"$2}'
 

@@ -2,8 +2,8 @@
 clusterSeqs <- function(
     seqDT=NULL,
     fastaFname=NULL,
-    program="cd-hit",
-    cdhit_seqIdThres=0.8,
+    program=c("cd-hit","uclust"),
+    seqIdThres=0.8,
     cdhit_wordLength=5,
     cdhit_global=FALSE,
     cdhit_minCovPropLongerSeq=0.2,
@@ -12,7 +12,8 @@ clusterSeqs <- function(
     cdhit_fast=FALSE,
     moreCommandArgs="",
     programBinary=system(paste0("which ",program),intern=T),
-    awkBinary=system("which awk",intern=T)
+    awkBinary=system("which awk",intern=T),
+    returnOnlyClusters=FALSE
 ){
   # DEV #################
   # seqDT=NULL
@@ -48,17 +49,17 @@ clusterSeqs <- function(
   seqDT_[,seqId_noSpace:=gsub("[[:space:]]","",seqId)]
 
   tfFastaFname <- tempfile(fileext = ".fasta")
-  tfOutFastaFname <- tempfile(fileext = ".out.fasta")
-  tfOutClstrFname <- paste0(tfOutFastaFname,".clstr")
-
   writeFasta(seqDT_[,.(seqId=seqId_noSpace,seq)],outFastaFname=tfFastaFname)
 
-  commandCdhit <- if(program=="cd-hit"){
-    paste0(
+  if(program[1]=="cd-hit"){
+    tfOutFastaFname <- tempfile(fileext = ".out.fasta")
+    tfOutClstrFname <- paste0(tfOutFastaFname,".clstr")
+
+    commandCdhit <- paste0(
       programBinary,
       " -B 1 -d 0 -i ",tfFastaFname,
       " -o ",  tfOutFastaFname,
-      " -c ",  cdhit_seqIdThres,
+      " -c ",  seqIdThres,
       " -n ",  cdhit_wordLength,
       " -G ",  as.integer(cdhit_global),
       " -aS ", cdhit_minCovPropShorterSeq,
@@ -66,17 +67,32 @@ clusterSeqs <- function(
       " -A ",  cdhit_minAlnLength,
       " -g ",  as.integer(cdhit_fast)
     )
-  } else { stop(paste0("Program ",program," not implemented yet ...")) }
-  commandParse <- paste0("cat ",tfOutClstrFname," | ",awkBinary," '",aScriptCdhitClstr2tbl,"'")
+    commandParse <- paste0("cat ",tfOutClstrFname," | ",awkBinary," '",aScriptCdhitClstr2tbl,"'")
 
-  ce("Running command: ",commandCdhit)
-  system(commandCdhit)
-  #system(paste0("cat ",tfOutFastaFname))
-  #system(paste0("cat ",tfOutClstrFname))
-  ce("Running command: ",commandParse)
-  clAssign <- fread(cmd=commandParse,header=F,col.names = c("seqId_noSpace","cluster"))
-  unlink(c(tfFastaFname,tfOutFastaFname,tfOutClstrFname))
-  return(clAssign[seqDT_,on=.(seqId_noSpace)][,seqId_noSpace:=NULL][])
+    ce("Running command: ",commandCdhit)
+    system(commandCdhit)
+    #system(paste0("cat ",tfOutFastaFname))
+    #system(paste0("cat ",tfOutClstrFname))
+    ce("Running command: ",commandParse)
+    clAssign <- fread(cmd=commandParse,header=F,col.names = c("seqId_noSpace","cluster"))
+    unlink(c(tfFastaFname,tfOutFastaFname,tfOutClstrFname))
+    if(returnOnlyClusters==TRUE){return(clAssign)}
+    return(clAssign[seqDT_,on=.(seqId_noSpace)][,seqId_noSpace:=NULL][])
+  } else if (program=="uclust"){
+    commandUclust <- paste0(
+        programBinary,
+        " -cluster_fast ",tfFastaFname,
+        " -id ",seqIdThres,
+        " -uc /dev/stdout | awk '",aScriptUclust2Tbl,"'"
+    )
+    ce("Running command: ",commandUclust)
+    clAssign <- fread(cmd=commandUclust,header=F,col.names = c("seqId_noSpace","cluster"))
+    unlink(tfFastaFname)
+    if(returnOnlyClusters==TRUE){return(clAssign)}
+    return(clAssign[seqDT_,on=.(seqId_noSpace)][,seqId_noSpace:=NULL][])
+  } else {
+    stop(paste0("Program ",program," not recognised or implemented, sorry."))
+  }
 }
 
 
