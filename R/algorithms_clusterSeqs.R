@@ -83,7 +83,7 @@ clusterSeqs <- function(
         programBinary,
         " -cluster_fast ",tfFastaFname,
         " -id ",seqIdThres,
-        " -uc /dev/stdout | awk '",aScriptUclust2Tbl,"'"
+        " -uc /dev/stdout | awk '",aScriptUclust2tbl,"'"
     )
     ce("Running command: ",commandUclust)
     clAssign <- fread(cmd=commandUclust,header=F,col.names = c("seqId_noSpace","cluster"))

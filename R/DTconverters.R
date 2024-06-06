@@ -65,4 +65,3 @@ alignmentDT2seqDT <- function(alignmentDT,seqOf="subject",numberSeqIds=FALSE,kee
   out[,..selCols]
 }
 
-

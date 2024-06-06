@@ -103,33 +103,49 @@ nu <- function(x){
 }
 
 
-# ldply but a data.table returns
 #' @export
 ldtply <- function(...){
   (ldply(...) %>% setDT)[]
 }
 
-
+#' Create a grid of values, calculated from every combination of two rows, one drawn from each of two data.tables.
+#'
+#' The
+#'
+#' @param dtx A data table. [no default]
+#' @param dty [optional] A data.table. If omitted, [NULL]
+#' @param nameColx [optional] Name of the column in `dtx` from which the output row names are to be taken. [NULL]
+#' @param nameColy [optional] Name of the column in `dty` from which the output column names are to be taken. [NULL]
+#' @param FUN  [no default]
+#' @returns A matrix of class whatever FUN outputs.
+#' @description
+#' The i,j-th entry of the output matrix is the result of `FUN(dtx[i],dty[j])`.
+#' @details
+#' Wraps to the console width. Coordinates are given relative to the sequence start.
+#' @examples
+#' ldply but a data.table returns
+#' d1 <- data.table(value=1:26,label1=LETTERS,label2=letters)
+#' d2 <- data.table(value=26:1,label1=LETTERS,label2=letters)
+#' gridApplyDT(d1,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
+#' gridApplyDT(d1,d2,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
 #' @export
-gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL,symmetrical=FALSE){
-  namesx <- if(!is.null(nameColx)){
+gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL){
+  namesx <- if(argGiven(nameColx)){
     dtx[,get(nameColx)]
   } else {
     NULL
   }
-  if(symmetrical==TRUE){
-    if(!is.null(dty) | !is.null(nameColy)){
-      stop("With `symmetrical`==TRUE, only `dtx` and `nameColx` arguments should be provided")
-    }
+  symmetrical <- if(argNotGiven(dty)){ # Symmetrical
     dty <- dtx
     namesy <- namesx
-  } else { # Asymmetrical
-    namesy <- if(!is.null(nameColy)){
-      dty[,get(nameColy)]
-    } else {
-      NULL
-    }
+    TRUE
+  } else {
+    FALSE
   }
+  if(argGiven(nameColy)){
+    namesy <- dty[,get(nameColy)]
+  }
+
   xlen <- nrow(dtx)
   ylen <- nrow(dty)
   om <- matrix(as(NA,class(FUN(dtx[1,],dty[2,]))),nrow=xlen,ncol=ylen,dimnames=list(namesx,namesy))
@@ -144,6 +160,10 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL,symmetrical
   }
   om
 }
+
+
+
+
 
 
 #' @export
@@ -190,7 +210,7 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 
 
 #' @export
-MSA <- function(seqDT,method="ClustalOmega",...){
+msa <- function(seqDT,method="ClustalOmega",...){
   require(msa)
   require(Biostrings)
   is_seqDT(seqDT,objName = deparse(substitute(seqDT)))
@@ -383,3 +403,24 @@ arch <- function(start,end,bottom,top,n=100L,...){
 }
 # null_plot(-10:10,-10:10)
 # arch(-5,2,-4,4,col="red",lwd=4,lty=2)
+
+#' @export
+maxSoFar <- function(x){
+  #rewrite in Rcpp
+  mxsf <- x[1]
+  sapply(x,function(xi) {if(xi>mxsf){ mxsf<<-xi }; mxsf } )
+}
+
+#' @export
+minSoFar <- function(x){
+  #rewrite in Rcpp
+  mnsf <- x[1]
+  sapply(x,function(xi) {if(xi<mnsf){ mnsf<<-xi }; mnsf } )
+}
+
+
+#' @export
+`%plusMinus%` <- function(x,pm){
+  range(x) + c(-pm,pm)
+}
+

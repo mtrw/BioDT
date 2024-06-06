@@ -112,8 +112,22 @@ makeValidator <- function( specName, requiredCols ){
   objSpecs <- objSpecList[objSpecsli]
 
   #dev library(data.table); validateMe = data.table(seqId="penis",seq=3.0,start=5,end=2); objName=deparse(substitute(validateMe)) ;requiredCols=c("seqId","start","end");croak=T
-  validator <- function(validateMe,objName=deparse(substitute(validateMe)),croak=FALSE,message=NULL){
-
+  validator <- function(validateMe=NULL,objName=deparse(substitute(validateMe)),croak=FALSE,message=NULL,showSpecs=FALSE){
+    if(showSpecs==TRUE){
+      o <- data.table(
+        Required_Column = requiredCols
+      )[
+        ,idx:=1L:.N
+      ][
+        ,Class:=get(Required_Column,colSpecList)$class
+      ,by=.(idx)][
+        ,Notes:=get(Required_Column,colSpecList)$valFun()
+      ,by=.(idx)][
+        ,idx:=NULL
+      ][]
+      return(o)
+    }
+    if(argNotGiven(validateMe)){ stop("Argument for `validateMe` must be given unless `showSpecs==TRUE`") }
     if(any(!requiredCols %in% colnames(validateMe))){
       if(croak){
         drawConsoleLine()
@@ -121,7 +135,7 @@ makeValidator <- function( specName, requiredCols ){
         drawConsoleLine()
         ce("Object `",objName,"` does not meet the specifications for a ",specName,":\n\tThe following columns are required but not present:")
         ce(paste0(requiredCols[!requiredCols %in% colnames(validateMe)],collapse=", "),"\n")
-        if(argGiven(message)){ ce("Notes: ", message ) }
+        if(argGiven(message)){ ce("Additional messages: ", message ) }
         drawConsoleLine()
         stop("See validator output above")
       } else {
@@ -199,7 +213,6 @@ makeValidator <- function( specName, requiredCols ){
 hasCol <- function(dt,colName){
   exists(colName,where=dt,inherits=FALSE)
 }
-
 
 
 
