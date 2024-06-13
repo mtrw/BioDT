@@ -7,6 +7,11 @@ ce <- function(...){
 }
 
 #' @export
+`%!in%` <- function(x,y){
+  !(x %in% y)
+}
+
+#' @export
 argGiven <- function(x){
   !is.null(x)
 }
@@ -162,8 +167,12 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL){
 }
 
 
-
-
+ask <- function(question="NULL"){
+  if(argGiven(question)){
+    ce(question)
+  }
+  readline()
+}
 
 
 #' @export

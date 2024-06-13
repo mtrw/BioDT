@@ -92,6 +92,10 @@ He <- function(x, inclNAs = F){
   # Should go on coordDT, alignDT
 # }
 
+#' @export
+charVec2Matrix <- function(x){
+  matrix(strsplit(paste0(x,collapse=""),"")[[1]],ncol=nchar(x[1]),nrow=length(x),byrow=T)
+}
 
 
 #' Convert an alignment from a vector of character strings to a matrix
@@ -108,7 +112,9 @@ He <- function(x, inclNAs = F){
 alnSeq2seqMatrix <- function(seqDT){
   is_seqDT(seqDT,croak = T)
   if(!all(nchar(seqDT$seq)==nchar(seqDT$seq[1]))){ stop("Sequences in 'seq' column must all be the same length.") }
-  matrix(strsplit(paste0(seqDT$seq,collapse=""),"")[[1]],ncol=nchar(seqDT$seq[1]),nrow=length(seqDT$seq),byrow=T,dimnames = list(seqDT$seqId))
+  m <- charVec2Matrix(seqDT$seq)
+  colnames(m) <- seqDT$seqId
+  m
 }
 
 
