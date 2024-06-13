@@ -24,9 +24,6 @@ A matrix of class whatever FUN outputs.
 The i,j-th entry of the output matrix is the result of `FUN(dtx[i],dty[j])`.
 }
 \details{
-The
-
-
 Wraps to the console width. Coordinates are given relative to the sequence start.
 }
 \examples{

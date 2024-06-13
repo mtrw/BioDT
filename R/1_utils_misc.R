@@ -115,8 +115,6 @@ ldtply <- function(...){
 
 #' Create a grid of values, calculated from every combination of two rows, one drawn from each of two data.tables.
 #'
-#' The
-#'
 #' @param dtx A data table. [no default]
 #' @param dty [optional] A data.table. If omitted, [NULL]
 #' @param nameColx [optional] Name of the column in `dtx` from which the output row names are to be taken. [NULL]
@@ -167,6 +165,14 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL){
 }
 
 
+
+#' Collect input from a user interactively.
+#'
+#' @param question [optional] A question to prompt the user with [NULL]
+#' @returns Whatever the user inputs before pressing <return>, as a character string.
+#' @examples
+#' while(ask("Guess the number I'm thinking of!")!=sample(1:1e9L,1)){ ce("WRONG!") }
+#' @export
 ask <- function(question="NULL"){
   if(argGiven(question)){
     ce(question)
