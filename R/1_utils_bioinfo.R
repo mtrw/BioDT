@@ -92,6 +92,15 @@ He <- function(x, inclNAs = F){
   # Should go on coordDT, alignDT
 # }
 
+
+#' Convert a vector of equal-length character strings into a matrix.
+#'
+#' @param x A (most usefully, character) vector.
+#' @returns A character matrix
+#' @description
+#' One string per row, one char per entry.
+#' @examples
+#' charVec2Matrix(c("Hello","dolly","sings","Satch"))
 #' @export
 charVec2Matrix <- function(x){
   matrix(strsplit(paste0(x,collapse=""),"")[[1]],ncol=nchar(x[1]),nrow=length(x),byrow=T)

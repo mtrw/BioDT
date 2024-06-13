@@ -2,8 +2,7 @@
 % Please edit documentation in R/1_utils_bioinfo.R
 \name{alnSeq2seqMatrix}
 \alias{alnSeq2seqMatrix}
-\title{#' @export
-Convert an alignment from a vector of character strings to a matrix}
+\title{Convert an alignment from a vector of character strings to a matrix}
 \usage{
 alnSeq2seqMatrix(seqDT)
 }
