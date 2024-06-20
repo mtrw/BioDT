@@ -224,26 +224,28 @@ pctIdMat <- function(seqDT=NULL,seqMatrix=NULL,inclGaps=T){
   d <- as.dist(out)
 }
 
-
-
-
 #' @export
 clumpCoordDT <- function(coordDT,distCutoff=0){
   is_coordDT(coordDT,croak=T)
+  if(any(c("clumpId","newBlockStart","pmxsf") %in% colnames(coordDT))){
+    warning("Columns named 'clumpId', 'newBlockStart' and/or 'pmxsf' in input will be overwritten or deleted. If you wish to keep them, please rename them.")
+  }
   c <- copy(coordDT)
+  if(any())
   c[end<start,c("start","end"):=.(end,start)]
   setkey(c,start,end)
   c[,pmxesf:=c(0,maxSoFar(end)[1:(.N-1)]),by=.(seqId)] # previous max end so far
   #c[,mnssf:=minSoFar(start),by=.(seqId)]
   c[,newBlockStart:=((start-distCutoff)>pmxesf)+0L,by=.(seqId)]
-  c[,block:=cumsum(newBlockStart),by=.(seqId)]
-  c[]
+  c[,clumpId:=cumsum(newBlockStart),by=.(seqId)]
+
+  c[,pmxesf:=NULL][,newBlockStart:=NULL][]
 }
 
 #' @export
 unionCoordDT <- function(coordDT,distCutoff=0){
   c <- clumpCoordDT(coordDT,distCutoff)
-  c[,.(start=min(start),end=(max(end))),by=.(seqId,block)]
+  c[,.(start=min(start),end=(max(end))),by=.(seqId,clumpId)]
 }
 
 

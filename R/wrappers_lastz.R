@@ -5,7 +5,7 @@ lastz <- function(
     queryFname=NULL,
     subjectSeqDT=NULL,
     querySeqDT=NULL,
-    outFastaFname=NULL,
+    outTableFname=NULL,
     addAlignments=FALSE,
     addPctIdGaps=FALSE,
     addNgaps=FALSE,
@@ -115,8 +115,8 @@ lastz <- function(
     if(hasCol(la,"pctId")) { la[,pctId:=as.numeric(sub("%","",pctId))] }
   }
 
-  if(argGiven(outFastaFname)){
-    write.table(la,outFastaFname,row.names=F,sep="\t",quote=F)
+  if(argGiven(outTableFname)){
+    write.table(la,outTableFname,row.names=F,sep="\t",quote=F)
   }
 
   if(makeSfile){ unlink(Sys.glob(paste0(subjectFname,".*"))) }

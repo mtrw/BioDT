@@ -38,8 +38,22 @@ pd <- function(x,add=F,bw="nrd0",plotMain=NA,...){
   }
 }
 
+#' Use it in place of a dirname to ensure it really exists.
+#' @export
+existentDir <- function(dirName){
+  if(!dir.exists(dirName)){
+    dir.create(dirName,recursive = T)
+  }
+  dirName
+}
 
+#'
+#' @export
+fileExistsNonZeroSize <- function(fName){
+  file.exists(fName) & file.size(fName)>0
+}
 
+#'
 #' @export
 filenameNopathNoext <- function(f,newPath="",newExt=""){
   sub("\\..*","",sub(".*[\\/]","",f)) %>% paste0(newPath,.,newExt)
