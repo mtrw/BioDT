@@ -119,7 +119,7 @@ charVec2Matrix <- function(x){
 #' He(c("A","A","G"))
 #' @export
 alnSeq2seqMatrix <- function(seqDT){
-  is_seqDT(seqDT,croak = T)
+  ce("NOT YET IMPLEMENTED BOTHER TIM PLEASE: VALIDATE IS msaDT IE with cols seqId and alnSeq")
   if(!all(nchar(seqDT$seq)==nchar(seqDT$seq[1]))){ stop("Sequences in 'seq' column must all be the same length.") }
   m <- charVec2Matrix(seqDT$seq)
   colnames(m) <- seqDT$seqId
