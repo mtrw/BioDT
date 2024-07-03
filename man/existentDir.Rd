@@ -5,7 +5,11 @@
 \title{Use it in place of a dirname to ensure it really exists.}
 \usage{
 existentDir(dirName)
+
+existentDir(dirName)
 }
 \description{
 Use it in place of a dirname to ensure it really exists.
+
+Return the argument (a directory name) but also make sure a directory called that exists.
 }

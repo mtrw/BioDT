@@ -415,14 +415,14 @@ groupifyByBoundaries <- function(x,boundaries,values=NULL){
   return(o)
 }
 
-
+#' Test all vector members are the same thing
 #' @export
 same <- function(x){
   nu(x)==1
 }
 
+#' Draw an arch
 #' @export
-#draw an arch
 arch <- function(start,end,bottom,top,n=100L,...){
   d <- data.table(
     x=cos(seq(0,pi,length.out=n)) %>% scale_between(start,end),
@@ -433,6 +433,7 @@ arch <- function(start,end,bottom,top,n=100L,...){
 # null_plot(-10:10,-10:10)
 # arch(-5,2,-4,4,col="red",lwd=4,lty=2)
 
+#' The largest value found in a vector so far
 #' @export
 maxSoFar <- function(x){
   #rewrite in Rcpp
@@ -440,6 +441,7 @@ maxSoFar <- function(x){
   sapply(x,function(xi) {if(xi>mxsf){ mxsf<<-xi }; mxsf } )
 }
 
+#' The smallest value found in a vector so far
 #' @export
 minSoFar <- function(x){
   #rewrite in Rcpp
@@ -447,9 +449,48 @@ minSoFar <- function(x){
   sapply(x,function(xi) {if(xi<mnsf){ mnsf<<-xi }; mnsf } )
 }
 
-
+#' Return the argument (a directory name) but also make sure a directory called that exists.
 #' @export
-`%plusMinus%` <- function(x,pm){
-  range(x) + c(-pm,pm)
+existentDir <- function(dirName){
+  sapply(dirName,function(dn){
+    if(!dir.exists(dn)){
+      dir.create(dn,recursive = T)
+    }
+    dn
+  })
+}
+
+#'
+#' @export
+mcldtply <- function(...){
+  require(parallel)
+  mclapply(...) %>% rbindlist
+}
+
+#' Expand grid wrapper that returns a data.table
+#' @export
+expandGridDt <- function(...){
+  expand.grid(...,stringsAsFactors = FALSE) %>% setDT
+}
+
+#' Add a tiny bit to each number.
+#' @description
+#' Useful when a collection of numbers on [0,Inf) need to be logged
+#' @param x The vector to add a bit to [no default]
+#' @param inc How much to add [min(x)*0.1]
+#' @returns A vector
+#' @export
+plusAtinyBit <- function(x,inc=min(x)*0.1){
+  x+inc
+}
+
+#' Return the range of x, extended by a bit
+#' @param x The vector to take the range of
+#' @param m Subtract me from the low end
+#' @param p Add me to the high end [m]
+#' @returns A length two vector
+#' @export
+`%plusMinus%` <- function(x,m,p=m){
+  range(x) + c(-m,p)
 }
 

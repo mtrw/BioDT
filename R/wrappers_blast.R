@@ -68,9 +68,13 @@ blast <- function(
   bl <- ldtply(subjectFname,function(sFn){
     tmp <- ldtply(queryFname,function(qFn){
       #dev sFn<-subjectFname[1]; qFn<-queryFname[1]
-      bcmd <- paste0(blastBinaryDir,"/",program," -query ",qFn," -db ",sFn," -outfmt '",outFmtArg,"' ",moreBlastArgs)
+      oFile <- tempfile()
+      bcmd <- paste0(blastBinaryDir,"/",program," -query ",qFn," -db ",sFn," -outfmt '",outFmtArg,"' ",moreBlastArgs," > ",oFile)
       ce("Running command: ",bcmd)
-      tmp <- fread(cmd = bcmd,col.names=outputColNames,colClasses=outputColClasses)
+      system(bcmd) -> exitCode
+      if(exitCode!=0){ stop(paste0("Blast command returned exit code ",exitCode," meaning something went wrong. Could be memory-killed, in which case, try breaking up the query (or subject) into fewer or smaller sequences.")) }
+      tmp <- fread(oFile,col.names=outputColNames,colClasses=outputColClasses)
+      unlink(oFile)
       if(!makeQfile){ tmp[,qFastaFname:=qFn][] }
       tmp
     })

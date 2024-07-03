@@ -2,16 +2,16 @@
 % Please edit documentation in R/IO_gff.R
 \name{readGff}
 \alias{readGff}
-\title{Read .fai files into a data.table}
+\title{Read annotation files in gff format into a data.table}
 \usage{
 readGff(gffFname)
 }
 \arguments{
-\item{faiFname}{A character vector. The .fai filename(s). [no default]}
+\item{faiFname}{A character vector. The .gff filename(s). [no default]}
 }
 \value{
-A data.table with .fai flavour.
+A data.table with coordDT flavour.
 }
 \description{
-Read .fai files into a data.table
+Read annotation files in gff format into a data.table
 }

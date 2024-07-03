@@ -284,7 +284,6 @@ clumpCoordDT <- function(coordDT,distCutoff=0){
     warning("Columns named 'clumpId', 'newBlockStart' and/or 'pmxsf' in input will be overwritten or deleted. If you wish to keep them, please rename them.")
   }
   c <- copy(coordDT)
-  if(any())
   c[end<start,c("start","end"):=.(end,start)]
   setkey(c,start,end)
   c[,pmxesf:=c(0,maxSoFar(end)[1:(.N-1)]),by=.(seqId)] # previous max end so far
@@ -297,8 +296,9 @@ clumpCoordDT <- function(coordDT,distCutoff=0){
 
 #' @export
 unionCoordDT <- function(coordDT,distCutoff=0){
+  is_coordDT(coordDT,croak = TRUE)
   c <- clumpCoordDT(coordDT,distCutoff)
-  c[,.(start=min(start),end=(max(end))),by=.(seqId,clumpId)]
+  c[,.(start=min(start),end=(max(end))),by=.(seqId,clumpId)][,clumpId:=NULL][]
 }
 
 
