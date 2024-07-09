@@ -5,6 +5,6 @@
 #' @export
 readGff <- function(gffFname) {
   ldtply(gffFname,function(fn){
-    fread(fn,select=c(1,3,4,5,7,9),col.names=c("seqId","class","start","end","strand","attributes"))[,c("start","end"):=.(pmin(end,start),pmax(end,start))][,gffFname:=fn][]
+    fread(cmd=paste0("cat ",fn,"| grep -v \"^#\""),header=F,select=c(1,3,4,5,7,9),col.names=c("seqId","class","start","end","strand","attributes"))[,c("start","end"):=.(pmin(end,start),pmax(end,start))][,gffFname:=fn][]
   })
 }
