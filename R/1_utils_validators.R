@@ -13,6 +13,11 @@ vIsBehaved <- function(x=NULL){
 }
 
 #' @export
+vIsBehavedSameLengthStrings <- function(x=NULL){
+  all(is.behaved(x)) & same(nchar(x))
+}
+
+#' @export
 vIsBehavedIntlikeFloat <- function(x=NULL){
   if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and have class \"numeric\", and be whole numbers (i.e. no decimals)")}
   all(is.behaved(x) & (x%%1==0))
@@ -66,6 +71,7 @@ makeValidator <- function( specName, requiredCols ){
     seq =             list( class="character" , valFun=vIsBehaved ),
     sSeq =            list( class="character" , valFun=vIsBehaved ),
     qSeq =            list( class="character" , valFun=vIsBehaved ),
+    alnSeq =          list( class="character" , valFun=vIsBehavedSameLengthStrings ),
     sAlnSeq =         list( class="character" , valFun=vIsBehaved ),
     qAlnSeq =         list( class="character" , valFun=vIsBehaved ),
     bedFname =        list( class="character" , valFun=vIsBehaved ),
@@ -120,11 +126,11 @@ makeValidator <- function( specName, requiredCols ){
         ,idx:=1L:.N
       ][
         ,Class:=get(Required_Column,colSpecList)$class
-      ,by=.(idx)][
-        ,Notes:=get(Required_Column,colSpecList)$valFun()
-      ,by=.(idx)][
-        ,idx:=NULL
-      ][]
+        ,by=.(idx)][
+          ,Notes:=get(Required_Column,colSpecList)$valFun()
+          ,by=.(idx)][
+            ,idx:=NULL
+          ][]
       return(o)
     }
     if(argNotGiven(validateMe)){ stop("Argument for `validateMe` must be given unless `showSpecs==TRUE`") }

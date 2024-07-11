@@ -31,3 +31,47 @@ aaTable <- data.table(
   aaProp   = c("pos", "pol", "pol", "pos", "pol", "ali", "ali", "pol", "pos",  "pol", "ali", "neg", "neg", "ali", "ali", "ali", "STP", "aro",  "pol", "aro", "aro")
 )
 
+#' @export
+ntCodesLegal <- c(
+  c("-" ,"A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),
+  c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower()
+)
+
+#' @export
+aaCodesLegal <- c(
+  c("-" ,"K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N", "*"),
+  c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N")  %>% tolower()
+)
+
+#' @export
+ntCodesLegalNogap <- c(
+  c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),
+  c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower()
+)
+
+#' @export
+aaCodesLegalNogap <- c(
+  c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "*", "Y", "C", "W", "F", "N"),
+  c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N")  %>% tolower()
+)
+
+#' @export
+ntCodesLegalUcOnly <- c(
+  c("-" ,"A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N")
+)
+
+#' @export
+aaCodesLegalUcOnly <- c(
+  c("-" ,"K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N", "*")
+)
+
+#' @export
+ntCodesLegalUcOnlyNogap <- c(
+  c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N")
+)
+
+#' @export
+aaCodesLegalUcOnlyNogap <- c(
+  c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N", "*")
+)
+

@@ -67,6 +67,44 @@ printAln <- function(s){
 }
 
 
+#' @export
+msa <- function(seqDT,method="ClustalOmega",seqType=c("guess","dna","aa"),...){
+  require(msa)
+  require(Biostrings)
+  is_seqDT(seqDT,objName = deparse(substitute(seqDT)))
+  stringSetFn <- if(seqType[1]=="dna"){
+    Biostrings::DNAStringSet
+  } else if (seqType[1]=="aa"){
+    Biostrings::AAStringSet
+  } else if(seqType[1]=="guess"){
+      testMe <- substr(seqDT$seq[1],1,1000)
+      testRegex <- paste0("[^",paste(ntCodesLegal,collapse=""),"]")
+      if(!grepl(testRegex,testMe)){
+        ce(
+          "First 100bp of first sequence contained only entries in the set ",
+          paste0("[",paste(ntCodesLegal,collapse=""),"]."),
+          " Guessing these are nucleotide sequences. To set it manually use 'seqType=\"dna\" or seqType=\"aa\".'"
+        )
+        Biostrings::DNAStringSet
+      } else {
+        ce(
+          "First 100bp of first sequence contained entries not in the set ",
+          paste0("[",paste(ntCodesLegal,collapse=""),"]."),
+          " Guessing these are amino acid sequences. To set it manually use 'seqType=\"dna\" or seqType=\"aa\".'"
+        )
+        Biostrings::AAStringSet
+      }
+  }
+
+  seqDT[,alnSeq:={
+    seq %>%
+      stringSetFn() %>%
+      msa::msa(method=method,order="input",...) %>%
+      msaConvert(type = "seqinr::alignment") %>%
+      `[[`("seq")
+  }][]
+}
+
 #' Effective heterozygosity of a vector of alleles
 #'
 #' @param x A  vector. Canonically, listing alleles in a population at some site. [no default]
@@ -118,11 +156,11 @@ charVec2Matrix <- function(x){
 #' @examples
 #' He(c("A","A","G"))
 #' @export
-alnSeq2seqMatrix <- function(seqDT){
-  ce("NOT YET IMPLEMENTED BOTHER TIM PLEASE: VALIDATE IS msaDT IE with cols seqId and alnSeq")
-  if(!all(nchar(seqDT$seq)==nchar(seqDT$seq[1]))){ stop("Sequences in 'seq' column must all be the same length.") }
-  m <- charVec2Matrix(seqDT$seq)
-  colnames(m) <- seqDT$seqId
+alignedSeqDT2seqMatrix <- function(seqDT){
+  is_alignedSeqDT(seqDT)
+  if(!all(nchar(seqDT$alnSeq)==nchar(seqDT$alnSeq[1]))){ stop("Sequences in 'seq' column must all be the same length.") }
+  m <- charVec2Matrix(seqDT$alnSeq)
+  rownames(m) <- seqDT$seqId
   m
 }
 
@@ -137,8 +175,8 @@ alnSeq2seqMatrix <- function(seqDT){
 #' Alignments are plotted horizontally, with the first given sequence on top.
 #' @details
 #' To plot from an alignmentDT, do a manual conversion. E.g., to 'melt' the alignments:
-#' ```alignmentDT[,alnId:=paste0("Alignment_",1:.N)][,seqId=c(sSeqId,qSeqId),seq=c(sAlnSeq,qAlnSeq),by=.(alnId)]```
-#' or call `alignmentDT2seqDT()` (be aware this function preserves only one of the subject or query sequences). Also, be aware most alignmentDTs have different length alignments, so you will typically be selecting a limited number of rows.
+#' ```alignmentDT[,alnId:=paste0("Alignment_",1:.N)][,seqId=c(sSeqId,qSeqId),alnSeq=c(sAlnSeq,qAlnSeq),by=.(alnId)]```
+#' or call `alignedSeqDT2seqMatrix()` (be aware this function preserves only one of the subject or query sequences). Also, be aware most alignmentDTs have different length alignments, so you will typically be selecting a limited number of rows.
 #' @examples
 #' seqDT <- data.table(
 #'   seq = c("GC-AT",
@@ -151,25 +189,59 @@ alnSeq2seqMatrix <- function(seqDT){
 #' plotNucleotideAlignment(seqDT,alnItemCols = applyPalette(1:4,palettePresets$williams),gapColour = "white")
 #' plotNucleotideAlignment(seqDT[,.(seqId,seq=seq2)])
 #' @export
-plotNucleotideAlignment <- function(seqDT,rowGap=0.05,alnItemCols=c("#990000","#000099","#009900","#BB9911"),invariantColour=NULL,gapColour="#BBBBBB",unknownNtColour="#FF55FF",labelsInAxis=TRUE,cex.axis=0.7,...){
-  is_seqDT(seqDT,croak = T)
-  sm <- alnSeq2seqMatrix(seqDT)
+plotSequenceAlignment <- function(seqDT,rowGap=0.05,alnPreset=c("guess","dna","aa"),alnItems=NULL,alnItemCols=NULL,invariantColour=NULL,gapColour="#BBBBBB",unknownNtColour="#FF55FF",labelsInAxis=TRUE,cex.axis=0.7,...){
+  is_alignedSeqDT(seqDT,croak = T)
+
+  if( sum(is.null(alnItemCols),is.null(alnItems))==1 | length(alnItemCols) != length(alnItems) ){ stop("With custom colours, both 'alnItems' and 'alnItemCols' must be given, and these must be the same length ...") }
+
+  if(argNotGiven(alnItems)){
+
+    if (alnPreset[1]=="guess"){
+      testMe <- substr(seqDT$seq[1],1,1000)
+      testRegex <- paste0("[^",paste(ntCodesLegal,collapse=""),"]")
+      if(!grepl(testRegex,testMe)){
+        ce(
+          "First 100bp of first sequence contained only entries in the set ",
+          paste0("[",paste(ntCodesLegal,collapse=""),"]."),
+          " Guessing these are nucleotide sequences. To set it manually use 'alnPreset=\"dna\" or alnPreset=\"aa\".'"
+        )
+        alnPreset[1] <- "dna"
+      } else {
+        ce(
+          "First 100bp of first sequence contained entries not in the set ",
+          paste0("[",paste(ntCodesLegal,collapse=""),"]."),
+          " Guessing these are amino acid sequences. To set it manually use 'alnPreset=\"dna\" or alnPreset=\"aa\".'"
+        )
+        alnPreset[1] <- "aa"
+      }
+    }
+
+    if(alnPreset[1]=="dna"){
+      alnItems <- c("A","C","G","T")
+      alnItemCols <- c("#990000","#000099","#009900","#BB9911")
+    } else if (alnPreset[1]=="aa"){
+      alnItems <- aaCodesLegalUcOnlyNogap
+      alnItemCols <- c(BioDT::applyPalette(1:(length(alnItems)-1),colChain=palettePresets$wheel),"#000000")
+    }
+  }
+
+  sm <- alignedSeqDT2seqMatrix(seqDT)
   plotTop <- (1+rowGap)*nrow(sm)
   seqNames <- seqDT$seqId
 
-  if(any(!sm %in% c("A","a","T","t","G","g","C","c","-"))){
-    warning("Unrecognised nucleotides (i.e. [^AGCTacgt-]) in alignments! These will be coloured according to `unknownNtColour`.")
+  if(any(!sm %in% c(alnItems,alnItems %>% tolower,"-"))){
+    warning(paste0("Some of the items (nucleotide or amino codes) in the alignments are not in 'alnItems'. These will be coloured according to `unknownNtColour`: ",sm[!sm %in% c(alnItems,alnItems %>% tolower,"-")] %>% unique %>% paste(collapse="")))
   }
 
   colsm <- apply(sm,2,function(c){
     if(!is.null(invariantColour) & all(c==c[1]) & c[1]!="-"){
       rep(invariantColour,length(c))
     } else {
-      return(swap(c,c("A","a","T","t","G","g","C","c","-"),c(alnItemCols[rep(1:4,each=2)],gapColour)))
+      return( swap( c, c(alnItems %>% toupper,alnItems %>% tolower,"-"), c(rep(alnItemCols,2),gapColour)) )
     }
   })
 
-  colsm[!sm %in% c("A","a","T","t","G","g","C","c","-")] <- unknownNtColour
+  colsm[!sm %in% c(alnItems %>% toupper,alnItems %>% tolower,"-")] <- unknownNtColour
 
   #par(mar=c(.5,15,.5,.5))
   null_plot(c(0,ncol(colsm)),c(0,plotTop),xaxt="n",yaxt="n",cex.axis=.3)
@@ -251,7 +323,7 @@ pctIdMat <- function(seqDT=NULL,seqMatrix=NULL,inclGaps=T){
   if(all(is.null(c(seqDT,seqMatrix)))){ stop("At least one of `seqId` and `seqMatrix` must be given") }
   if(!is.null(seqDT)){
     is_seqDT(seqDT,croak = T)
-    seqMatrix <- alnSeq2seqMatrix(seqDT)
+    seqMatrix <- alignedSeqDT2seqMatrix(seqDT)
   }
 
   out <- matrix(NA,nrow=nrow(seqMatrix),ncol=nrow(seqMatrix))
@@ -332,3 +404,77 @@ noNestAlignmentDT <- function(alignmentDT,markOnly=F){
 }
 
 
+#' @export
+translateCoordsClumpGapkill <- function(coordDT=NULL,coordVec=NULL,clumpCoordDT,interClumpGap=1e3){
+  if(argGiven(coordDT) & argNotGiven(coordVec)){
+    coordDT <- copy(coordDT)
+  } else if (argGiven(coordVec) & argNotGiven(coordDT)){
+    warning("'seqId' column of clumpCoordDT will not be used and all entries will be set to \"\"")
+    clumpCoordDT$seqId <- ""
+    coordDT <- data.table(
+      start=coordVec,
+      end=coordVec,
+      seqId=""
+    )
+  } else {
+    stop("One and only one of coordDT or coordVec must be provided ...")
+  }
+  clumpCoordDT <- copy(clumpCoordDT)
+  setkey(clumpCoordDT,seqId,start,end)
+  setkey(coordDT,seqId,start,end)
+
+  clumpCoordDT[,distToPrev:=start-c(0,end[1:(.N-1)])]
+  clumpCoordDT[,adjust:= cumsum(-distToPrev) + (1:.N) + interClumpGap*(0:(.N-1))]
+
+  coordDT <- foverlaps(coordDT,clumpCoordDT,type="any")
+  if(any(is.na(coordDT$clumpId))){
+    warning("Some data points provided in coordDT fall into gaps! These will be omitted from the output:")
+    print(coordDT[is.na(clumpId),.(seqId,start=i.start,end=i.end)])
+    #coordDT <- coordDT[!is.na(clumpId),]
+  }
+
+  setnames(coordDT,c("i.start","i.end"),c("start_original","end_original"))
+  coordDT[,start:=start_original+adjust]
+  if(argGiven(coordVec)){ return(coordDT$start) }
+  coordDT[,end:=end_original+adjust]
+  coordDT[]
+}
+# d <- data.table(
+#   position = as.numeric(sort(sample(1:1e5,30)))
+# )[,geneId:=paste0("seq_",1:.N)][]
+# d <- d[,.SD[c(1,1)],by=.(geneId)]
+# d[,posType:=rep(c("start","end"),30)]
+# d[posType=="end",position:=position+1000]
+# plot(d$position,y=rep(1,nrow(d)),col=applyPalette(d$posType,palettePresets$mclaren2),pch=20)
+# geneCoords <- dcast(d,formula=geneId~posType,value.var = "position")
+# geneCoords[,seqId:="chr3H"]
+#
+# # Use unionCoordDT() to get the clump boundaries (this is different to how we started, listing gaps)
+# clumps <- unionCoordDT(geneCoords,distCutoff = 5e3)
+#
+# # translateCoordsGapkill() will translate any coordDT to catenate the specified clumps together. The gap placed between them is given in 'interClumpGap='
+# geneCoordsTransformed <- translateCoordsClumpGapkill(coordDT=geneCoords,clumpCoordDT=clumps,interClumpGap = 1e3)
+# # use the same transformation to transform some axes
+# axisRaw <- geneCoordsTransformed[,seq(from=min(start_original),to=max(end_original),by=1e3)]
+# #debugonce(translateCoordsGapkill)
+# axisTransformed <- translateCoordsClumpGapkill(coordVec = axisRaw,clumpCoordDT=clumps,interClumpGap = 1e3)
+# clumpsTransformed <- translateCoordsClumpGapkill(coordDT=clumps,clumpCoordDT=clumps,interClumpGap = 1e3)
+#
+# null_plot(geneCoordsTransformed[,range(c(start,end))],0:2,xaxt="n",yaxt="n")
+# axis( #bit shit ...
+#   side = 1,
+#   at = axisTransformed,
+#   labels=axisRaw,
+#   cex.axis=.7,
+#   las=2
+# )
+# clumpsTransformed[,{
+#   rect(xleft = start,xright=end,ybottom=0,ytop=2,col="#BB000066",border=F)
+# }]
+# geneCoordsTransformed[,{
+#   lines(
+#     x=c(start,end),
+#     y=c(1,1),
+#     lwd=2
+#   )
+# },by=.(geneId)]

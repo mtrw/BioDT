@@ -238,21 +238,6 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 #most_common_thing(x=c(1,1,1,2,2,2,3,3,NA,NA,NA,NA,NA),draw_out="DRAW!",na_wins_out="na was the most common",na.rm=T)
 
 
-#' @export
-msa <- function(seqDT,method="ClustalOmega",...){
-  require(msa)
-  require(Biostrings)
-  is_seqDT(seqDT,objName = deparse(substitute(seqDT)))
-
-
-  seqDT[,alnSeq:={
-    seq %>%
-      Biostrings::DNAStringSet() %>%
-      msa::msa(method=method,order="input",...) %>%
-      msaConvert(type = "seqinr::alignment") %>%
-      `[[`("seq")
-  }][]
-}
 
 #' @export
 drawConsoleLine <- function(){

@@ -27,6 +27,8 @@ has_qFastaFname <- makeValidator( "has_qFastaFname" , c("qFastaFname") )
 #' @export
 is_seqDT <- makeValidator( "is_seqDT" , c("seqId","seq") )
 #' @export
+is_alignedSeqDT <- makeValidator( "is_alignedSeqDT" , c("seqId","alnSeq") )
+#' @export
 is_seqDT_with_seqFname <- makeValidator( "is_seqDT_with_seqFname" , c("seqId","seq","seqFname") )
 #' @export
 is_coordDT <- makeValidator( "is_coordDT" , c("seqId","start","end") )
