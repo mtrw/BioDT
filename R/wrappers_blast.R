@@ -1,3 +1,12 @@
+
+#' A convenience function to read in tabular BLAST output in the format requested (under the bonnet) by this wrapper
+#'
+#' @export
+readBlastTable <- function(fileName,outputColNames=c( "sSeqId",    "qSeqId" ,    "matchLength" , "sStart" , "qStart", "sEnd"  ,     "qEnd" ,   "pctId_noGaps" , "eValue" , "bitscore" ),outputColClasses=c("character", "character", "integer",      "numeric",  "numeric", "numeric" , "numeric", "numeric",       "numeric", "numeric" )){
+  ldtply(fileName,function(fn){ fread(fn,col.names = outputColNames, colClasses = outputColClasses)[,blastTableFname:=fn] })
+}
+
+
 #' Call blast* aligner family programs
 #'
 #' @param param1_name What it is. Defaults?
