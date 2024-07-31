@@ -358,7 +358,7 @@ clumpCoordDT <- function(coordDT,distCutoff=0){
   c <- copy(coordDT)
   c[end<start,c("start","end"):=.(end,start)]
   setkey(c,start,end)
-  c[,pmxesf:=c(0,maxSoFar(end)[1:(.N-1)]),by=.(seqId)] # previous max end so far
+  c[,pmxesf:=if(.N==1){end}else{c(0,maxSoFar(end)[1:(.N-1)])},by=.(seqId)] # previous max end so far
   #c[,mnssf:=minSoFar(start),by=.(seqId)]
   c[,newBlockStart:=((start-distCutoff)>pmxesf)+0L,by=.(seqId)]
   c[,clumpId:=cumsum(newBlockStart),by=.(seqId)]

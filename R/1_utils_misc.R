@@ -240,6 +240,25 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 
 
 #' @export
+qq <- function(x,y=1:length(x)){
+  stopifnot(length(x)==length(y))
+  data.table(
+    qx=sort(x)/length(x),
+    qy=sort(y)/length(y)
+  )
+}
+
+
+#' @export
+qqPlot <- function(x,y=1:length(x),...){
+  d <- qq(x,y)
+  plot(d$qx,d$qy)
+}
+
+
+
+
+#' @export
 drawConsoleLine <- function(){
   require(stringi)
   w <- options()$width
