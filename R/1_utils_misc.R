@@ -20,6 +20,12 @@ argNotGiven <- function(x){
   is.null(x)
 }
 
+#' Collapse a vector
+#' @export
+pastec <- function(x,sep=""){
+  paste0(x,collapse=sep)
+}
+
 #' @export
 printVecRows <- function(x){cat(paste(x,collapse="\n"))}
 
@@ -280,7 +286,6 @@ scale_between <- function(x,lower,upper){
 `%scale_between%` <- function(x,y){
   x %>% scale_between(y[1],y[2])
 }
-
 
 #' @export
 interpolate <- function(in_x,xs,ys){
