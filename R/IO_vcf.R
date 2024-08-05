@@ -50,6 +50,8 @@ parseGenotypes <- function(ref,alts,gts,colNamePrefix="Allele_",gtEncoding=c("li
   }
 }
 
+
+#' @export
 vcf2varDT <- function(vcfFname,keepInfoFields=FALSE,keepGtFields=FALSE,maxAllelesPerSite=2,parseGTs=c("literal","altCount","no"),IDprefix="ID:"){ #2 reminds us it is biallelics only
   require(stringr)
   v <- readVcfRaw(vcfFname)
