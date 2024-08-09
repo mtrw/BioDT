@@ -119,7 +119,7 @@ extractSeq <- function (
   coordDT[,{
     tbFname <- tempfile(fileext = ".bed")
     writeBed(.SD,tbFname)
-    command <- paste0(bedToolsBin," getfasta -fi ",fastaFname," -bed ",tbFname," -s >> ",outFastaFname)
+    command <- paste0(bedToolsBin," getfasta -fi ",fastaFname," -bed ",tbFname," -name -s >> ",outFastaFname)
     system(command)
     unlink(tbFname)
   },by=.(fastaFname)]

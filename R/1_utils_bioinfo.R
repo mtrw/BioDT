@@ -440,3 +440,17 @@ translateCoordsClumpGapkill <- function(coordDT=NULL,coordVec=NULL,clumpCoordDT,
 #     lwd=2
 #   )
 # },by=.(geneId)]
+
+#' @export
+ambigRegex <- function(seq,conversionTable=ambig2ntAmbigOnly){
+  conversionTable[,{
+    seq <<- sub(nt,paste0("[",ambig,"]"),seq)
+    NULL
+  },by=.I]
+  seq
+}
+
+#' @export
+coordDTNameSeqIdChrSwitch <- function(coordDT){ coordDT[,chr:=seqId][,seqId:=name][,name:=NULL][] }
+
+

@@ -2,7 +2,6 @@
 
 #' @export
 showPalettes <- function(colPalettes=palettePresets,gradientN=NULL){
-
   if(is.character(colPalettes)){
     colPalettes <- list(colPalettes)
   }

@@ -61,6 +61,23 @@ ntCodesLegalUcOnly <- c(
 )
 
 #' @export
+ntCodesLegalUcOnly <- c(
+  c("-","A", "C", "G", "T" , "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N")
+)
+
+#' @export
+ambig2nt <- data.table(
+  nt=c(c("-","A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower),
+  ambig=c(c("-","A", "C", "G", "T", "AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT"),c("A", "C", "G", "T", "AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT") %>% tolower)
+)
+
+#' @export
+ambig2ntAmbigOnly <- data.table(
+  nt=c(c("M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),c("M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower),
+  ambig=c(c("AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT"),c("AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT") %>% tolower)
+)
+
+#' @export
 aaCodesLegalUcOnly <- c(
   c("-" ,"K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N", "*")
 )
@@ -74,4 +91,7 @@ ntCodesLegalUcOnlyNogap <- c(
 aaCodesLegalUcOnlyNogap <- c(
   c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "Y", "C", "W", "F", "N", "*")
 )
+
+
+
 
