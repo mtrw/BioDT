@@ -72,9 +72,10 @@ alpha <- function(colChain,setAlpha=1L){
 applyPalette <- function(x,colChain=palettePresets$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE){ # An evenly spaced palette interpolating the colChain
 
   # Ascertain discreteness
+  bi <- isBehaved(x)
   #n <- length(x)
   discrete <- if(discreteOrContinuous[1]=="guess"){
-    !(is.numeric(x) | is.integer(x))
+    !(is.numeric(x[bi]) | is.integer(x[bi]))
   } else if (discreteOrContinuous[1]=="discrete"){
     TRUE
   } else if (discreteOrContinuous[1]=="continuous"){
@@ -87,20 +88,22 @@ applyPalette <- function(x,colChain=palettePresets$wheel,setAlpha=NULL,discreteO
 
   if(discrete==TRUE){
     # Build table per value
-    tbl <- data.table(joiner=unique(x))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
+    tbl <- data.table(joiner=unique(x[bi]))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
     setkey(tbl,joiner)
-    return( tbl[data.table(joiner=x),on=.(joiner)]$col )
+    return( tbl[data.table(joiner=x[bi]),on=.(joiner)]$col )
   } else {
     # Check low number of unique vals -- if so, make a table using interpolation and merge
-    if(nu(x)/length(x) < 0.20){
+    if(nu(x[bi])/length(x[bi]) < 0.20){
       #x <- sample(5,10,r=T)
-      tbl <- data.table(joiner=unique(x))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
+      tbl <- data.table(joiner=unique(x[bi]))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
       setkey(tbl,joiner)
-      return( tbl[data.table(joiner=x),on=.(joiner)]$col )
+      return( tbl[data.table(joiner=x[bi]),on=.(joiner)]$col )
     }
     # ... else ...
     # Interpolate
-    return( makePalette(colChain=colChain,at=x,setAlpha=setAlpha) )
+    x[bi] <- makePalette(colChain=colChain,at=x[bi],setAlpha=setAlpha)
+    x[!bi] <- NA_character_
+    return( x )#makePalette(colChain=colChain,at=x,setAlpha=setAlpha) )
   }
   # if(returnLegend==TRUE){ ... } # wherever appropriate ...
 }
