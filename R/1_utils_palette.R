@@ -2,6 +2,7 @@
 
 #' @export
 showPalettes <- function(colPalettes=palettePresets,gradientN=NULL){
+  colPalettes <- flattenList(colPalettes)
   if(is.character(colPalettes)){
     colPalettes <- list(colPalettes)
   }
@@ -14,7 +15,7 @@ showPalettes <- function(colPalettes=palettePresets,gradientN=NULL){
       colPalette <- colPalettes[[j]]
       n <- length(colPalette)
     } else {
-      colPalette <- makeLinearPalette(colPalettes[[j]],gradientN)
+      colPalette <- makePalette(colPalettes[[j]],gradientN)
       n <- gradientN
     }
     width <- 1/n
@@ -49,7 +50,7 @@ parseColChain <- function(colChain,setAlpha=NULL){
 
 #' Makes a simple linear palette interpolating the colChain across n evenly spaced points. Mostly useful for calling from other funs.
 #' @export
-makePalette <- function(colChain=palettePresets$wheel,n=NULL,at=NULL,setAlpha=NULL){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
+makePalette <- function(colChain=palettePresets$wheel$wheel,n=NULL,at=NULL,setAlpha=NULL){ # colours in the palette defined by the colChain, matched to [`type=`] "discrete" or "continuous" data.
   if(sum(argGiven(n),argGiven(at))!=1){ stop("One of 'n' or 'at' must be supplied, not both.") }
   if(argGiven(n)){
     at <- 1:n
@@ -69,7 +70,7 @@ alpha <- function(colChain,setAlpha=1L){
 
 
 #' @export
-applyPalette <- function(x,colChain=palettePresets$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE){ # An evenly spaced palette interpolating the colChain
+applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE){ # An evenly spaced palette interpolating the colChain
 
   # Ascertain discreteness
   bi <- isBehaved(x)

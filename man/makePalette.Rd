@@ -5,7 +5,7 @@
 \title{Makes a simple linear palette interpolating the colChain across n evenly spaced points. Mostly useful for calling from other funs.}
 \usage{
 makePalette(
-  colChain = palettePresets$wheel,
+  colChain = palettePresets$wheel$wheel,
   n = NULL,
   at = NULL,
   setAlpha = NULL

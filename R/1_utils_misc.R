@@ -65,6 +65,13 @@ filenameNopathNoext <- function(f,newPath="",newExt=""){
   sub("\\..*","",sub(".*[\\/]","",f)) %>% paste0(newPath,.,newExt)
 }
 
+# ... to a list with no sublists
+#' @export
+flattenList <- function(x) {
+  do.call(c, lapply(x, function(y) if(is.list(y)) flattenList(y) else list(y)))
+}
+#flattenList(palettePresets)
+
 #create an empty plot with ranges x=c(low,high) and y=ditto
 #' @export
 null_plot <- function(x,y,xlab=NA,ylab=NA,revx=F,revy=F,...){
