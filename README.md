@@ -20,17 +20,17 @@ BioDT is being developed by [Tim Rabanus-Wallace](https://safes.unimelb.edu.au/r
 
 *Example:*
 
-#${PATH} must include recent versions of blast, bedtools, awk, ...
+\# ${PATH} must include recent versions of blast, bedtools, awk, ...
 
 require(BioDT) # also loads data.table and magrittr
 
-# Read in some 'seed' sequences to study from a file
+\# Read in some 'seed' sequences to study from a file
 seedSeqs <- readFasta("data/seed_seqs.fasta")
-# find homologs in a reference genome
+\# find homologs in a reference genome
 bl <- blast(subjectFname="data/genome.fasta",querySeqDT=seedSeqs)
-# Remind yourself ... what constitutes a valid alignmentDT?
+\# Remind yourself ... what constitutes a valid alignmentDT?
 is_alignmentDT(show=TRUE)
-# Plot results
+\# Plot results
 bl[,{
   x <- pmean2(sStart,sEnd) # using BioDT::pmean2()
   y <- frank(sSeqId)
@@ -38,15 +38,15 @@ bl[,{
   null_plot(x,y)
   points(x,y,col=col,pch=20,cex=2)
 }]
-# Filter for 5 best hits per query
+\# Filter for 5 best hits per query
 setorder(bl,qSeqId,bitscore)
 bestHits <- bl[,last(.SD,5),by=.(qSeqId)] # using data.table::last()
-# Get coords of hits plus surrounding sequence
+\# Get coords of hits plus surrounding sequence
 surround <- 500L
 bestHitSurroundCoords <- alignmentDT2coordDT(bestHits,coordsOf = "subject")[,.(seqId,start=start-surround,end=end+surround)]
-# Get the seqs of the hits plus surrounding context
+\# Get the seqs of the hits plus surrounding context
 bestHitSurroundSeq <- extractSeq(coordDT=bestHitSurroundCoords,fastaFname = "data/genome.fasta")
-# Multiply align
+\# Multiply align
 msa <- MSA(bestHitSurroundSeq)
-# Plot the alignment with custom colours
+\# Plot the alignment with custom colours
 plotNucleotideAlignment( msa[,.(seqId,seq=alnSeq)] )
