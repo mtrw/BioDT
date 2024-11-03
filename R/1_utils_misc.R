@@ -265,8 +265,10 @@ qq <- function(x,y=1:length(x)){
 #' @export
 qqPlot <- function(x,y=1:length(x),...){
   d <- qq(x,y)
-  plot(d$qx,d$qy)
+  plot(d$qx,d$qy,...)
 }
+
+
 
 
 

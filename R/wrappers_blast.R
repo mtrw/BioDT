@@ -67,7 +67,7 @@ blast <- function(
   })
 
   if(addAlignments==TRUE){
-    outFmtArg %<>% paste(outFmtArg,c("sseq qseq"))
+    outFmtArg %<>% paste(c("sseq qseq"))
     outputColNames %<>% c("sAlnSeq","qAlnSeq")
     outputColClasses %<>% c("character","character")
   }
