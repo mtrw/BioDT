@@ -4,12 +4,11 @@
 #' @returns A data.table with .fai flavour.
 #' @export
 readFai <- function( #read a fai file
-  faiFname  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
+  faiFname
 ){
-  out <- ldply(faiFname,function(fn){ #dev fn <- "/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta.fai"
-    fread(fn,select=1:2,header=F,col.names=c("seqName","length"))
-  }) %>% setDT
-  return(out)
+  ldtply(faiFname,function(fn){
+    fread(fn,select=1:2,header=F,col.names=c("seqId","seqLength"))[,faiFname:=fn][]
+  })
 }
 
 
@@ -23,13 +22,13 @@ readFai <- function( #read a fai file
 #' Wrapper for samtools faidx
 #' @export
 makeFai <- function( #make fai files
-  fastaFname,  #fastaFname=c("/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta","/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta")
+  fastaFname,
   faiFname=paste0(fastaFname,".fai"),
-  samtoolsBin=system("which samtools", intern=TRUE)
+  samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   stopifnot("FastaFname and faiFname must be the same length" = length(fastaFname)==length(faiFname))
   l_ply(1:length(fastaFname),function(i){
-    command <- paste0(samtoolsBin," faidx -o ",faiFname[i]," ",fastaFname[i])
+    command <- paste0(samtoolsBinary," faidx -o ",faiFname[i]," ",fastaFname[i])
     system(command)
   })
   return(faiFname)
@@ -45,12 +44,18 @@ makeFai <- function( #make fai files
 #' Calls samtools faidx
 #' @export
 getFai <- function( #from a FASTA file straight into an R fai
-    fastaFname,  #fastaFname="/data/gpfs/projects/punim1869/shared_data/misc_sequence/btr_btrLike_queries_Morex_GP.fasta"
-    samtoolsBin=system("which samtools", intern=TRUE)
+    fastaFname,
+    samtoolsBinary=system("which samtools", intern=TRUE)
 ){
   out <- ldply(fastaFname,function(fn){
-    command <- paste0(samtoolsBin," faidx -o /dev/stdout ",fn)
-    fread(cmd=command,select=1:2,header=F,col.names=c("seqName","length"))
+    if(file.exists(faiFn <- paste0(fastaFname,".fai"))){
+      warning(paste0("Found a file ",faiFn,". Will attempt to read fai info from that."))
+      readFai(faiFn)
+    } else {
+      command <- paste0(samtoolsBinary," faidx -o /dev/stdout ",fn)
+      fread(cmd=command,select=1:2,header=F,col.names=c("seqId","seqLength"))
+    }
   }) %>% setDT
   return(out)
 }
+

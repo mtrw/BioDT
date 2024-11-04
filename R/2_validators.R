@@ -1,20 +1,49 @@
 #' @export
-hasSeqFname <- makeValidator(seqFname_valSpecs)
+has_SeqId <- makeValidator( "has_seqId" , c("seqId") )
 #' @export
-hasSeqId <- makeValidator(hasSeqId_valSpecs)
+has_strand <-makeValidator( "has_strand" , c("strand") )
 #' @export
-hasStrand <- makeValidator(hasStrand_valSpecs)
+has_name <- makeValidator( "has_name" , c("name") )
 #' @export
-hasName <- makeValidator(hasName_valSpecs)
+has_score <- makeValidator( "has_score" , c("score") )
 #' @export
-hasScore <- makeValidator(hasScore_valSpecs)
+has_start_end <- makeValidator( "has_start_end" , c("start","end") )
 #' @export
-hasStartEnd <- makeValidator(hasStartEnd_valSpecs)
+has_start <- makeValidator( "has_start" , c("start") )
 #' @export
-isSeqDT <- makeValidator(seq_valSpecs)
+has_end <- makeValidator( "has_end" , c("end") )
 #' @export
-isSeqDT_withSeqFname <- function(validateMe,...){ isSeqDT(validateMe,...) & hasSeqFname(validateMe,...) }
+has_sqAlnSeqs <- makeValidator( "has_sqAlnSeqs" , c("sAlnSeq","qAlnSeq") )
 #' @export
-isCoordDT <- makeValidator(coord_valSpecs,function(coordDT){coordDT[,all(start<=end)]})
+has_sAlnSeq <-makeValidator( "has_sAlnSeq" , c("sAlnSeq") )
 #' @export
-isCoordDT_outputsFileStrand <- function(validateMe,...){ isCoordDT(validateMe,...) & hasScore(validateMe,...) & hasName(validateMe,...) & hasStrand(validateMe,...) }
+has_qAlnSeq <-makeValidator( "has_qAlnSeq" , c("qAlnSeq") )
+#' @export
+has_fastaFname <- makeValidator( "fastaFname" , c("fastaFname") )
+#' @export
+has_sFastaFname <- makeValidator( "has_sFastaFname" , c("sFastaFname") )
+#' @export
+has_qFastaFname <- makeValidator( "has_qFastaFname" , c("qFastaFname") )
+#' @export
+is_seqDT <- makeValidator( "is_seqDT" , c("seqId","seq") )
+#' @export
+is_alignedSeqDT <- makeValidator( "is_alignedSeqDT" , c("seqId","alnSeq") )
+#' @export
+is_seqDT_with_seqFname <- makeValidator( "is_seqDT_with_seqFname" , c("seqId","seq","seqFname") )
+#' @export
+is_coordDT <- makeValidator( "is_coordDT" , c("seqId","start","end") )
+#' @export
+is_seqListDT <- makeValidator( "is_seqListDT" , c("seqId") )
+#' @export
+has_minSize_maxSize <- makeValidator( "has_minSize_maxSize" , c("minSize","maxSize") )
+#' @export
+has_optimalSize <- makeValidator( "has_optimalSize" , c("optimalSize") )
+#' @export
+has_internal <- makeValidator( "has_internal" , c("internal") )
+#' @export
+has_minProductSize <- makeValidator( "has_minProductSize" , c("productMinSize") )
+#' @export
+has_maxProductSize <- makeValidator( "has_maxProductSize" , c("productMaxSize") )
+#' @export
+is_alignmentDT <- makeValidator( "is_alignmentDT" , c("sSeqId","qSeqId","sStart","sEnd","qStart","qEnd") )
+

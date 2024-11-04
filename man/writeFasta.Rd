@@ -4,17 +4,17 @@
 \alias{writeFasta}
 \title{Write a fasta or fasta.gz file}
 \usage{
-writeFasta(fasta, fastaFname = NULL, gzip = F, nameCol = "seqId")
+writeFasta(seqDT, outFastaFname = NULL, gzip = F, nameCol = "seqId")
 }
 \arguments{
-\item{fasta}{A .fasta-flavoured data.table.}
-
-\item{fastaFname}{A character vector. The .fasta filenames to write. If NULL will use the deparsed/substituted variable name given as the arg to `fasta` [NULL]}
-
 \item{gzip}{Logical value. Create gzipped outpit? Calls gzip via R's native gzfile() interface. [FALSE]}
 
 \item{nameCol}{Character value. The column to take fasta header names from. ["seqId"]}
+
+\item{fasta}{A .fasta-flavoured data.table.}
+
+\item{fastaFname}{A character vector. The .fasta filenames to write. If NULL will use the deparsed/substituted variable name given as the arg to `fasta` [NULL]}
 }
 \description{
-Calls awk normally, and samtools faidx is namesOnly==TRUE. Calls gzip if the filename ends in ".gz". Note this writes all the given fasta-dts into ONE file, i.e., if you writeFasta(readFasta(someFastaFileNames)) you will concatenate all the someFastaFileNames into one output.
+Calls awk. Note this writes all the given fasta-dts into ONE file, i.e., if you writeFasta(readFasta(someFastaFileNames)) you will concatenate all the someFastaFileNames into one output.
 }

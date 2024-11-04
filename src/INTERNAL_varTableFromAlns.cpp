@@ -32,17 +32,17 @@ DataFrame INTERNAL_varTableFromAlns(DataFrame aln){
     long int s1len = s1.length();
     long int s2len = s2.length();
 
-    // Rcpp::Rcout << s1start << "::";
-    // Rcpp::Rcout << s2start << "\n";
-    // printf("%s::",s1);
-    // printf("%s\n",s2);
-    // std::cout << inc1 << "::";
-    // std::cout << inc2 << "\n";
-    // std::cout << s1pos << "::";
-    // std::cout << s2pos << "\n";
-    // std::cout << s1len << "::";
-    // std::cout << s2len << "\n";
-    // std::cout << "----------------------------------------------------\n\n";
+    Rcpp::Rcout << s1start << "::";
+    Rcpp::Rcout << s2start << "\n";
+    printf("%s::",s1);
+    printf("%s\n",s2);
+    std::cout << inc1 << "::";
+    std::cout << inc2 << "\n";
+    std::cout << s1pos << "::";
+    std::cout << s2pos << "\n";
+    std::cout << s1len << "::";
+    std::cout << s2len << "\n";
+    std::cout << "----------------------------------------------------\n\n";
 
     if(s1len!=s2len){
       stop("Sequences must be of equal length");

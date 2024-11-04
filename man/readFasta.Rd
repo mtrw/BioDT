@@ -8,8 +8,7 @@ readFasta(
   fastaFname,
   saveFnames = TRUE,
   namesOnly = FALSE,
-  awkBin = system("which awk", intern = TRUE),
-  samtoolsBin = system("which samtools", intern = TRUE)
+  awkBinary = system("which awk", intern = TRUE)
 )
 }
 \arguments{
@@ -17,11 +16,9 @@ readFasta(
 
 \item{saveFnames}{Logical value. Include a fastaFname column in the output? [TRUE]}
 
-\item{namesOnly}{Logical value. If true, will return only the seqName column. Calls samtools faidx.}
+\item{namesOnly}{Logical value. If true, will return only the seqId column. Calls samtools faidx.}
 
 \item{awkBin}{Character value. Where to find awk [system("which awk", intern=TRUE)]}
-
-\item{samtoolsBin}{Character value. In case namesOnly==TRUE, where to find samtools. [system("which samtools", intern=TRUE)]}
 
 \item{gzipBin}{Character value. Where to find gzip. [system("which gzip", intern=TRUE)]}
 }
