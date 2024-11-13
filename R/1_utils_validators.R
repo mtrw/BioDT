@@ -38,13 +38,13 @@ vIsBehavedPositive <- function(x=NULL){
 #' @export
 vIsBehavedCommaSepInts <- function(x=NULL){
   if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a digit [0-9] or a comma (,)")}
-  all(is.behaved(x) & !grepl("[^[:digit:],:]",x))
+  all(is.behaved(x) & !grepl("[^[:digit:],]",x))
 }
 
 #' @export
 vIsBehavedSimpleText <- function(x=NULL){
-  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a 'normal' letter, digit, or underscore")}
-  all(is.behaved(x) & x!="" & !grepl("[^[:alnum:]_:]",x))
+  if(argNotGiven(x)){return("Must not have NA, NAN, or Infinite values, and all values must be a 'normal' letter, digit, underscore, or dot")}
+  all(is.behaved(x) & x!="" & !grepl("[^[:alnum:]_:\\.]",x))
 }
 
 vIsBehavedStrand <- function(x=NULL){
@@ -62,7 +62,6 @@ vContainsWhitespace <- function(x=NULL){
 
 #' @export
 makeValidator <- function( specName, requiredCols ){
-
   # One day export this data to a factory-factory?
   colSpecList <- list(
     seqId =           list( class="character" , valFun=vIsBehaved ), # Every 'valFun' function in this list must  return a text explanation if its `x` arg is NULL
@@ -157,7 +156,7 @@ makeValidator <- function( specName, requiredCols ){
     oc[,Reserved_Name:=Column_Name %in% names(colSpecList)]
 
     oc[Reserved_Name==TRUE,c("Required_Class","Class","Pass_Class","Pass_Column_Rules"):={
-      # Column_Name = "seq"
+      # Column_Name = "name"
       rcl <- get(Column_Name,colSpecList)$class
       cl <- validateMe[,class(get(Column_Name))]
       pc <- (rcl==cl)
@@ -169,7 +168,7 @@ makeValidator <- function( specName, requiredCols ){
     oc[Reserved_Name==FALSE,Pass_Column_Rules:=NA]
     #oc[Reserved_Name==FALSE,Notes:="Column not subject to specifications."]
     if(any(oc[Reserved_Name==TRUE,Pass_Class==FALSE | Pass_Column_Rules==FALSE])){
-      oc[Reserved_Name==TRUE & (Pass_Class==FALSE | Pass_Column_Rules==FALSE),Notes:=get(Column_Name,colSpecList)$valFun(),by=.(idx)]
+      oc[Reserved_Name==TRUE & (Pass_Class==FALSE | Pass_Column_Rules==FALSE),Notes:=get(Column_Name,colSpecList)$valFun()[1],by=.(idx)]
     }
 
     oc[,idx:=NULL]
