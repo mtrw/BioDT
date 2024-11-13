@@ -22,7 +22,7 @@ readFasta <- function(
     out <- ldtply(fastaFname,function(fn){
       catBashArg <- if(grepl("\\.gz^",fn)){ "gunzip -c" } else { "cat" }
       command <- paste0(catBashArg," ",fn," | ", awkBinary , " '" , aScriptFasta2tbl , "' ")
-      o <- fread(cmd=command,header=F,col.names=c("seqId","seq"))
+      o <- fread(cmd=command,header=F,col.names=c("seqId","seq"),sep="\t")
       if(saveFnames){ o[,fastaFname:=fn] }
       o
     })
