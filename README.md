@@ -22,6 +22,9 @@ BioDT is being developed by [Tim Rabanus-Wallace](https://safes.unimelb.edu.au/r
 ```
 # ${PATH} must include recent versions of blast, bedtools, awk, ...
 
+# If needed. You will need to make sure `msa` and `Biostrings` are installed first using BiocManager. This will be fixed.
+# remotes::install_github("https://github.com/mtrw/BioDT")
+
 require(BioDT) # also loads data.table and magrittr
 
 # Read in some 'seed' sequences to study from a file
