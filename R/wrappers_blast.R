@@ -7,6 +7,7 @@ readBlastTable <- function(fileName,outputColNames=c( "sSeqId",    "qSeqId" ,   
 }
 
 
+
 #' Call blast* aligner family programs
 #'
 #' @param param1_name What it is. Defaults?

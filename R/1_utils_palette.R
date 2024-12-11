@@ -55,9 +55,9 @@ makePalette <- function(colChain=palettePresets$wheel$wheel,n=NULL,at=NULL,setAl
   if(argGiven(n)){
     at <- 1:n
   }
-  parseColChain(colChain,setAlpha) %>%
+  parseColChain(colChain, setAlpha) %>%
     apply( 1 , function(r) { approx(seq_along(r) %scale_between% range(at),r,at)$y } ) %>%
-    apply( 1 , function(r) {rgb(r[1],r[2],r[3],r[4])} )
+    apply( 1 , function(r) { rgb(r[1],r[2],r[3],r[4]) } )
 }
 
 #' @export
