@@ -495,12 +495,15 @@ expandGridDt <- function(...){
 #' @description
 #' Useful when a collection of numbers on [0,Inf) need to be logged
 #' @param x The vector to add a bit to [no default]
-#' @param inc How much to add [min(x)*0.1]
+#' @param inc How much to add [0.001 times the smallest non-zero gap between two consecutive data points (after sorting) ]
+#' @param shiftAboveZero Shift all values upwards to make negative values slightly positive at the end. [FALSE]
 #' @returns A vector
 #' @export
-plusAtinyBit <- function(x,inc=min(x)*0.1){
+plusAtinyBit <- function(x,inc={t<-abs(diff(sort(c[!is.na(c)]))); min(t[t>0])}*0.001,shiftAboveZero=FALSE){
+  #if(shiftAboveZero & !all(x>0,na.rm=TRUE)){ x <- x+min(x,na.rm=T) }
   x+inc
 }
+
 
 #' Return the range of x, extended by a bit
 #' @param x The vector to take the range of
