@@ -4,12 +4,21 @@
 \alias{plusAtinyBit}
 \title{Add a tiny bit to each number.}
 \usage{
-plusAtinyBit(x, inc = min(x) * 0.1)
+plusAtinyBit(
+  x,
+  inc = {
+     t <- abs(diff(sort(x[!is.na(x)])))
+     min(t[t > 0])
+ } * 0.001,
+  shiftToZero = FALSE
+)
 }
 \arguments{
 \item{x}{The vector to add a bit to [no default]}
 
-\item{inc}{How much to add [min(x)*0.1]}
+\item{inc}{How much to add [0.001 times the smallest non-zero gap between two consecutive data points (after sorting) ]}
+
+\item{shiftToZero}{Shift all values to sit along \[0,...\] before adding `inc` [FALSE]}
 }
 \value{
 A vector
