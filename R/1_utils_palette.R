@@ -142,7 +142,7 @@ plotLegend <- function( xRange , yRange , legendDT , col_bg="#FFFFFFFF" , col_bo
   nCols <- nrow(legendDT)
   xInt <- diff(xRange)
   yInt <- diff(yRange)
-  rect(xRange[1],yRange[1],xRange[2],yRange[2],border=,col=col_bg)
+  rect(xRange[1],yRange[1],xRange[2],yRange[2],border=col_border,col=col_bg)
   colBoxLeft  <-  xRange[1]+(xInt*pos_middle)
   colBoxRight <-  xRange[1]+(xInt*(29/30))
   colBoxTop <-    yRange[2]-(yInt*0.05)
@@ -150,7 +150,6 @@ plotLegend <- function( xRange , yRange , legendDT , col_bg="#FFFFFFFF" , col_bo
   textEndRight <- xRange[1]+(xInt*pos_middle)
   #colBoxWidth <- diff(c(colBoxRight,colBoxLeft))
   colBoxHeight <-  diff(c(colBoxBottom,colBoxTop))
-  rect(colBoxLeft,colBoxBottom,colBoxRight,colBoxTop)
   eachColHeight <-colBoxHeight/(nCols+(nCols-1)*gap)
   eachGapHeight <- gap * eachColHeight
   eachColAndGapHeight <- eachColHeight + eachGapHeight
