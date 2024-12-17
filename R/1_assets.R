@@ -24,7 +24,7 @@ palettePresets <- list(
 
 
 #' @export
-codonTable <- data.table(
+codonTable <- d.t(
   codon = c("aaa", "aac", "aag", "aat", "aca", "acc", "acg",  "act", "aga", "agc", "agg", "agt", "ata", "atc", "atg", "att",  "caa", "cac", "cag", "cat", "cca", "ccc", "ccg", "cct", "cga",  "cgc", "cgg", "cgt", "cta", "ctc", "ctg", "ctt", "gaa", "gac",  "gag", "gat", "gca", "gcc", "gcg", "gct", "gga", "ggc", "ggg",  "ggt", "gta", "gtc", "gtg", "gtt", "taa", "tac", "tag", "tat",  "tca", "tcc", "tcg", "tct", "tga", "tgc", "tgg", "tgt", "tta",  "ttc", "ttg", "ttt"),
   CODON = c("AAA", "AAC", "AAG", "AAT", "ACA",  "ACC", "ACG", "ACT", "AGA", "AGC", "AGG", "AGT", "ATA", "ATC",  "ATG", "ATT", "CAA", "CAC", "CAG", "CAT", "CCA", "CCC", "CCG",  "CCT", "CGA", "CGC", "CGG", "CGT", "CTA", "CTC", "CTG", "CTT",  "GAA", "GAC", "GAG", "GAT", "GCA", "GCC", "GCG", "GCT", "GGA",  "GGC", "GGG", "GGT", "GTA", "GTC", "GTG", "GTT", "TAA", "TAC",  "TAG", "TAT", "TCA", "TCC", "TCG", "TCT", "TGA", "TGC", "TGG",  "TGT", "TTA", "TTC", "TTG", "TTT"),
   aaName = c("Lys", "Asn",  "Lys", "Asn", "Thr", "Thr", "Thr", "Thr", "Arg", "Ser", "Arg",  "Ser", "Ile", "Ile", "Met", "Ile", "Gln", "His", "Gln", "His",  "Pro", "Pro", "Pro", "Pro", "Arg", "Arg", "Arg", "Arg", "Leu",  "Leu", "Leu", "Leu", "Glu", "Asp", "Glu", "Asp", "Ala", "Ala",  "Ala", "Ala", "Gly", "Gly", "Gly", "Gly", "Val", "Val", "Val",  "Val", "Stp", "Tyr", "Stp", "Tyr", "Ser", "Ser", "Ser", "Ser",  "Stp", "Cys", "Trp", "Cys", "Leu", "Phe", "Leu", "Phe"),
@@ -32,7 +32,7 @@ codonTable <- data.table(
 )
 
 #' @export
-aaTable <- data.table(
+aaTable <- d.t(
   aaName   = c("Lys", "Asn", "Thr", "Arg", "Ser", "Ile", "Met", "Gln", "His",  "Pro", "Leu", "Glu", "Asp", "Ala", "Gly", "Val", "Stp", "Tyr",  "Cys", "Trp", "Phe"),
   aaSymbol = c("K", "N", "T", "R", "S", "I", "M", "Q", "H", "P", "L", "E",  "D", "A", "G", "V", "*", "Y", "C", "W", "F"),
   aaProp   = c("pos", "pol", "pol", "pos", "pol", "ali", "ali", "pol", "pos",  "pol", "ali", "neg", "neg", "ali", "ali", "ali", "STP", "aro",  "pol", "aro", "aro")
@@ -73,13 +73,13 @@ ntCodesLegalUcOnly <- c(
 )
 
 #' @export
-ambig2nt <- data.table(
+ambig2nt <- d.t(
   nt=c(c("-","A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),c("A", "C", "G", "T", "M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower),
   ambig=c(c("-","A", "C", "G", "T", "AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT"),c("A", "C", "G", "T", "AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT") %>% tolower)
 )
 
 #' @export
-ambig2ntAmbigOnly <- data.table(
+ambig2ntAmbigOnly <- d.t(
   nt=c(c("M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N"),c("M", "R", "W", "S", "Y", "K", "V", "H",  "D", "B", "N") %>% tolower),
   ambig=c(c("AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT"),c("AC", "AG", "AT", "GC", "CT", "GT", "ACG", "ACT",  "AGT", "CGT", "ACGT") %>% tolower)
 )

@@ -116,10 +116,10 @@ makeValidator <- function( specName, requiredCols ){
   })
   objSpecs <- objSpecList[objSpecsli]
 
-  #dev library(data.table); validateMe = data.table(seqId="penis",seq=3.0,start=5,end=2); objName=deparse(substitute(validateMe)) ;requiredCols=c("seqId","start","end");croak=T
+  #dev library(data.table); validateMe = d.t(seqId="penis",seq=3.0,start=5,end=2); objName=deparse(substitute(validateMe)) ;requiredCols=c("seqId","start","end");croak=T
   validator <- function(validateMe=NULL,objName=deparse(substitute(validateMe)),croak=FALSE,message=NULL,showSpecs=FALSE){
     if(showSpecs==TRUE){
-      o <- data.table(
+      o <- d.t(
         Required_Column = requiredCols
       )[
         ,idx:=1L:.N
@@ -148,7 +148,7 @@ makeValidator <- function( specName, requiredCols ){
       }
     }
 
-    oc <- data.table(
+    oc <- d.t(
       Column_Name = union(requiredCols,colnames(validateMe))
     )[,idx:=1L:.N][]
 
@@ -188,7 +188,7 @@ makeValidator <- function( specName, requiredCols ){
     }
     wc <- ldtply(objSpecs,function(spec){
       #browser()
-      data.table(
+      d.t(
         Pass_Table_Rule = spec[[2]](validateMe),
         Rule = spec[[3]]
       )

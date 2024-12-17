@@ -140,7 +140,7 @@ alignedSeqDT2seqMatrix <- function(seqDT){
 #' ```alignmentDT[,alnId:=paste0("Alignment_",1:.N)][,seqId=c(sSeqId,qSeqId),alnSeq=c(sAlnSeq,qAlnSeq),by=.(alnId)]```
 #' or call `alignedSeqDT2seqMatrix()` (be aware this function preserves only one of the subject or query sequences). Also, be aware most alignmentDTs have different length alignments, so you will typically be selecting a limited number of rows.
 #' @examples
-#' seqDT <- data.table(
+#' seqDT <- d.t(
 #'   seq = c("GC-AT",
 #'           "TC-AA"),
 #'   seq2 = c("ABCD","EFGH"),
@@ -373,7 +373,7 @@ translateCoordsClumpGapkill <- function(coordDT=NULL,coordVec=NULL,clumpCoordDT,
   } else if (argGiven(coordVec) & argNotGiven(coordDT)){
     warning("'seqId' column of clumpCoordDT will not be used and all entries will be set to \"\"")
     clumpCoordDT$seqId <- ""
-    coordDT <- data.table(
+    coordDT <- d.t(
       start=coordVec,
       end=coordVec,
       seqId=""
@@ -401,7 +401,7 @@ translateCoordsClumpGapkill <- function(coordDT=NULL,coordVec=NULL,clumpCoordDT,
   coordDT[,end:=end_original+adjust]
   coordDT[]
 }
-# d <- data.table(
+# d <- d.t(
 #   position = as.numeric(sort(sample(1:1e5,30)))
 # )[,geneId:=paste0("seq_",1:.N)][]
 # d <- d[,.SD[c(1,1)],by=.(geneId)]

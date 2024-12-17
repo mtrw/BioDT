@@ -1,7 +1,4 @@
 #' @export
-d.t <- function(...){data.table(...)}
-
-#' @export
 ce <- function(...){
   cat(paste0(...,"\n"), sep='', file=stderr()) %>% eval(envir = globalenv() ) %>% invisible()
 }
@@ -119,7 +116,7 @@ blastDBexists <- function(root,typePrefix="n"){
     return(TRUE)
   } else {
     ce("Database not detected:")
-    print(data.table(
+    print(d.t(
       expectedFile=expectedFiles,
       exists=file.exists(expectedFiles)
     ))
@@ -154,8 +151,8 @@ ldtply <- function(...){
 #' Wraps to the console width. Coordinates are given relative to the sequence start.
 #' @examples
 #' ldply but a data.table returns
-#' d1 <- data.table(value=1:26,label1=LETTERS,label2=letters)
-#' d2 <- data.table(value=26:1,label1=LETTERS,label2=letters)
+#' d1 <- d.t(value=1:26,label1=LETTERS,label2=letters)
+#' d2 <- d.t(value=26:1,label1=LETTERS,label2=letters)
 #' gridApplyDT(d1,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
 #' gridApplyDT(d1,d2,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
 #' @export
@@ -255,7 +252,7 @@ mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out
 #' @export
 qq <- function(x,y=1:length(x)){
   stopifnot(length(x)==length(y))
-  data.table(
+  d.t(
     qx=sort(x)/length(x),
     qy=sort(y)/length(y)
   )
@@ -380,7 +377,7 @@ consensusSeq <- function(alnSeqDT,seqId="unnamed_consensus_sequence"){
     }
     if(is.na(s)){browser()}
   }
-  data.table(
+  d.t(
     seqId = seqId,
     seq=s
   )
@@ -442,7 +439,7 @@ same <- function(x){
 #' Draw an arch
 #' @export
 arch <- function(start,end,bottom,top,n=100L,...){
-  d <- data.table(
+  d <- d.t(
     x=cos(seq(0,pi,length.out=n)) %>% scale_between(start,end),
     y=sin(seq(0,pi,length.out=n)) %>% scale_between(bottom,top)
   )

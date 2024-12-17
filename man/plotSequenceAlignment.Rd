@@ -35,7 +35,7 @@ To plot from an alignmentDT, do a manual conversion. E.g., to 'melt' the alignme
 or call `alignedSeqDT2seqMatrix()` (be aware this function preserves only one of the subject or query sequences). Also, be aware most alignmentDTs have different length alignments, so you will typically be selecting a limited number of rows.
 }
 \examples{
-seqDT <- data.table(
+seqDT <- d.t(
   seq = c("GC-AT",
           "TC-AA"),
   seq2 = c("ABCD","EFGH"),

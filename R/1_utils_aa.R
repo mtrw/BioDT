@@ -1,6 +1,6 @@
 lookupAA_CODON2symbol_functory <- function(codonTable){
   function(CODON){
-    c <- data.table(CODON=CODON)
+    c <- d.t(CODON=CODON)
     codonTable[c,on="CODON"]$aaSymbol
   }
 }
@@ -15,7 +15,7 @@ lookupAA_CODON2symbol <- lookupAA_CODON2symbol_functory(codonTable)
 
 lookupAA_codon2symbol_functory <- function(codonTable){
   function(codon){
-    c <- data.table(codon=codon)
+    c <- d.t(codon=codon)
     codonTable[c,on="codon"]$aaSymbol
   }
 }
@@ -30,7 +30,7 @@ lookupAA_codon2symbol <- lookupAA_codon2symbol_functory(codonTable)
 
 lookupAA_symbol2aaProperty_functory <- function(aaTable){
   function(aaSymbol){
-    s <- data.table(aaSymbol=aaSymbol)
+    s <- d.t(aaSymbol=aaSymbol)
     aaTable[s,on="aaSymbol"]$aaProp
   }
 }

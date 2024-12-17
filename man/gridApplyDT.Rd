@@ -28,8 +28,8 @@ Wraps to the console width. Coordinates are given relative to the sequence start
 }
 \examples{
 ldply but a data.table returns
-d1 <- data.table(value=1:26,label1=LETTERS,label2=letters)
-d2 <- data.table(value=26:1,label1=LETTERS,label2=letters)
+d1 <- d.t(value=1:26,label1=LETTERS,label2=letters)
+d2 <- d.t(value=26:1,label1=LETTERS,label2=letters)
 gridApplyDT(d1,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
 gridApplyDT(d1,d2,nameColx = "label1",nameColy = "label2",FUN = function(x,y){ abs(x$value - y$value) })
 }

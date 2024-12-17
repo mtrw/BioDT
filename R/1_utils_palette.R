@@ -70,7 +70,7 @@ alpha <- function(colChain,setAlpha=1L){
 
 
 #' @export
-applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE){ # An evenly spaced palette interpolating the colChain
+applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE,returnLegend=FALSE,assignLegend=NULL){ # An evenly spaced palette interpolating the colChain
 
   # Ascertain discreteness
   bi <- isBehaved(x)
@@ -85,26 +85,83 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
     stop("Value for `discreteOrContinuous=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
   }
 
-
-
   if(discrete==TRUE){
     # Build table per value
-    tbl <- data.table(joiner=unique(x[bi]))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
+    tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
     setkey(tbl,joiner)
-    return( tbl[data.table(joiner=x[bi]),on=.(joiner)]$col )
+    out <- tbl[d.t(joiner=x[bi]),on=.(joiner)]$col
+    if(returnLegend==TRUE){ return( list(out,tbl[,.(label=joiner,col)]) ) }
+    if(argGiven(assignLegend)){ assign(assignLegend,tbl[,.(label=joiner,col)],envir=globalenv()) }
+    return( out )
   } else {
     # Check low number of unique vals -- if so, make a table using interpolation and merge
     if(nu(x[bi])/length(x[bi]) < 0.20){
-      #x <- sample(5,10,r=T)
-      tbl <- data.table(joiner=unique(x[bi]))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
+      tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
+      if( returnLegend==TRUE || argGiven(assignLegend) ) {
+        leg <- tbl[,.(label=if(.N>1){c(first(joiner),rep(NA,.N-2),last(joiner))}else{joiner},col)]
+        if( returnLegend==TRUE ){ return( list(out,leg) ) }
+        if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
+      }
       setkey(tbl,joiner)
-      return( tbl[data.table(joiner=x[bi]),on=.(joiner)]$col )
+      return( tbl[d.t(joiner=x[bi]),on=.(joiner)]$col )
+    } else {
+      # Interpolate
+      p <- character(length(x))
+      p[bi] <- makePalette(colChain=colChain,at=x[bi],setAlpha=setAlpha)
+      p[!bi] <- NA_character_
+      if( returnLegend==TRUE || argGiven(assignLegend) ) {
+        leg <- d.t( col = p[bi] )[order(x[bi]),][,label:=if(.N>1){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
+        if( returnLegend==TRUE ){ return( list(out,leg) ) }
+        if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
+      }
+      return( p )
     }
-    # ... else ...
-    # Interpolate
-    x[bi] <- makePalette(colChain=colChain,at=x[bi],setAlpha=setAlpha)
-    x[!bi] <- NA_character_
-    return( x )#makePalette(colChain=colChain,at=x,setAlpha=setAlpha) )
   }
-  # if(returnLegend==TRUE){ ... } # wherever appropriate ...
 }
+
+
+
+
+plotLegend <- function( xRange , yRange , legendDT , col_bg="#FFFFFFFF" , col_border="#000000FF" , col_text=legendDT$col , pos_middle=0.5 , gap=NULL , ...){
+
+  # applyPalette(strsplit("Of the world’s 20 largest economies, Australia is the only one not using nuclear energy, or moving towards using it."," ")[[1]],assignLegend = "l")
+  # applyPalette(sample(22),assignLegend = "l")
+  # legendDT = l
+  # col_text=legendDT$col
+  # col_border="#000000FF"
+  # pos_middle=0.5
+  # xRange <- c(1,5)
+  # yRange <- c(1,5)
+  # gap=NULL
+  # #plot(1:nrow(legendDT),col=legendDT$col,cex=3,pch=20)
+
+  if(argNotGiven(gap)){
+    gap <- if(any(is.na(legendDT))){ 0.0 } else { 0.2 }
+  }
+  legendDT$col <- col_text
+  nCols <- nrow(legendDT)
+  xInt <- diff(xRange)
+  yInt <- diff(yRange)
+  rect(xRange[1],yRange[1],xRange[2],yRange[2],border=,col=col_bg)
+  colBoxLeft  <-  xRange[1]+(xInt*pos_middle)
+  colBoxRight <-  xRange[1]+(xInt*(29/30))
+  colBoxTop <-    yRange[2]-(yInt*0.05)
+  colBoxBottom <- yRange[1]+(yInt*0.05)
+  textEndRight <- xRange[1]+(xInt*pos_middle)
+  #colBoxWidth <- diff(c(colBoxRight,colBoxLeft))
+  colBoxHeight <-  diff(c(colBoxBottom,colBoxTop))
+  rect(colBoxLeft,colBoxBottom,colBoxRight,colBoxTop)
+  eachColHeight <-colBoxHeight/(nCols+(nCols-1)*gap)
+  eachGapHeight <- gap * eachColHeight
+  eachColAndGapHeight <- eachColHeight + eachGapHeight
+  colTops <- colBoxTop - ((1:nCols)-1)*eachColAndGapHeight
+  l_ply(1:nCols,function(i_col){
+    #i_col <- 1
+    rect(colBoxLeft,colTops[i_col]-eachColHeight,colBoxRight,colTops[i_col],border=NA,col=legendDT$col[i_col])
+    text(textEndRight,colTops[i_col]-eachColHeight/2,labels=legendDT$label[i_col],pos=2)#,...)
+  })
+
+
+}
+
+
