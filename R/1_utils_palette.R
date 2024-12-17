@@ -121,7 +121,7 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
 
 
 
-
+#' @export
 plotLegend <- function( xRange , yRange , legendDT , col_bg="#FFFFFFFF" , col_border="#000000FF" , col_text=legendDT$col , pos_middle=0.5 , gap=NULL , ...){
 
   # applyPalette(strsplit("Of the world’s 20 largest economies, Australia is the only one not using nuclear energy, or moving towards using it."," ")[[1]],assignLegend = "l")
