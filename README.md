@@ -63,3 +63,6 @@ msa <- MSA(bestHitSurroundSeq)
 plotNucleotideAlignment( msa[,.(seqId,seq=alnSeq)] )
 
 ```
+
+
+**CITATION** (to pre-release verion): Rabanus-Wallace, M.T. (2025) *BioDT: All your bioinformatics done from R, using data.tables.* doi.org/10.5281/zenodo.14927782
