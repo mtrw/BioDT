@@ -59,6 +59,10 @@ bestHitSurroundSeq <- extractSeq(coordDT=bestHitSurroundCoords,fastaFname = "dat
 # Multiply align
 msa <- MSA(bestHitSurroundSeq)
 
+
+
+CITATION (to pre-release verion): Rabanus-Wallace, M.T. (2025) BioDT: All your bioinformatics done from R, using data.tables. doi.org/10.5281/zenodo.14927782
+
 # Plot the alignment with custom colours
 plotNucleotideAlignment( msa[,.(seqId,seq=alnSeq)] )
 
