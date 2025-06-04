@@ -22,7 +22,7 @@ lastz <- function(
 ){
 
   makeBioDTOutput <- if(all(argNotGiven(c(outFmtArg,outputColNames,outputColClasses)))){
-    outFmtArg <- "general:name1,name2,ncolumn,start1,end1,start2,end2,strand1,strand2,blastid%,score"
+    outFmtArg <- "general:name1,name2,ncolumn,start1,end1,start2+,end2+,strand1,strand2,blastid%,score"
     outputColNames <-   c("sSeqId",    "qSeqId" ,    "matchLength" , "sStart" , "sEnd", "qStart"  ,    "qEnd" , "sStrand" , "qStrand" ,   "pctId_noGaps" , "score")
     outputColClasses <- c("character", "character",  "integer",      "numeric", "numeric", "numeric",  "numeric", "character" , "character" , "numeric" ,  "numeric")
     TRUE
@@ -107,9 +107,10 @@ lastz <- function(
           #  ssName<-
           sSubsetArg <- paste0("\\[subset=<(echo \"",ssName,"\")\\]")
           qSubsetArg <- if(selfAlignment==TRUE) {" --self"} else {paste0("\\[subset=<(echo \"",qsName,"\")\\]")}
+          #browser()
           cmd <- paste0(lastzBinary," ",sFn,sSubsetArg," ",qFn,qSubsetArg," --format=",outFmtArg," ",otherLastzArgs)#,"\["sSubset,sRange,qFile,qSubset,qRange,outFmtArgs,otherArgs)
           ce(cmd)
-          #fread(cmd=cmd,col.names=outputColNames)
+          #fread(cmd=cmd)
           tmp <- fread(cmd=cmd,col.names=outputColNames,colClasses=outputColClasses)
           if(!makeSfile){ tmp[,sFastaFname:=sFn][] }
           if(!makeQfile){ tmp[,qFastaFname:=qFn][] }

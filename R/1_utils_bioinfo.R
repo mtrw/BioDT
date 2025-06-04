@@ -89,7 +89,7 @@ He <- function(x, inclNAs = F){
 
 #' #' @export
 # addStrand < function(alignmentDT){ # implement me
-  # Should go on coordDT, alignDT
+# Should go on coordDT, alignDT
 # }
 
 
@@ -146,10 +146,10 @@ alignedSeqDT2seqMatrix <- function(seqDT){
 #'   seq2 = c("ABCD","EFGH"),
 #'   seqId = LETTERS[1:2]
 #' )
-#' plotNucleotideAlignment(seqDT)
-#' plotNucleotideAlignment(seqDT,invariantColour = "black")
-#' plotNucleotideAlignment(seqDT,alnItemCols = applyPalette(1:4,palettePresets$williams),gapColour = "white")
-#' plotNucleotideAlignment(seqDT[,.(seqId,seq=seq2)])
+#' plotSequenceAlignment(seqDT)
+#' plotSequenceAlignment(seqDT,invariantColour = "black")
+#' plotSequenceAlignment(seqDT,alnItemCols = applyPalette(1:4,palettePresets$williams),gapColour = "white")
+#' plotSequenceAlignment(seqDT[,.(seqId,seq=seq2)])
 #' @export
 plotSequenceAlignment <- function(seqDT,rowGap=0.05,alnPreset=c("guess","dna","aa"),alnItems=NULL,alnItemCols=NULL,invariantColour=NULL,gapColour="#BBBBBB",unknownNtColour="#FF55FF",labelsInAxis=TRUE,cex.axis=0.7,...){
   is_alignedSeqDT(seqDT,croak = T)
@@ -183,7 +183,7 @@ plotSequenceAlignment <- function(seqDT,rowGap=0.05,alnPreset=c("guess","dna","a
       alnItemCols <- c("#990000","#000099","#009900","#BB9911")
     } else if (alnPreset[1]=="aa"){
       alnItems <- aaCodesLegalUcOnlyNogap
-      alnItemCols <- c(BioDT::applyPalette(1:(length(alnItems)-1),colChain=palettePresets$wheel),"#000000")
+      alnItemCols <- c(BioDT::applyPalette(1:(length(alnItems)-1),colChain=palettePresets$wheel$wheel),"#000000")
     }
   }
 
@@ -214,13 +214,15 @@ plotSequenceAlignment <- function(seqDT,rowGap=0.05,alnPreset=c("guess","dna","a
         xright = j,
         ytop = plotTop-((i-1)*(1+rowGap)),
         ybottom = plotTop-((i-1)*(1+rowGap))-1,
-        border=NA,
-        col = colsm[i,j]
+        border="#000000",
+        lwd=0.3,
+        col = colsm[i,j],
+        ...
       )
     }
   }
   yPts <- plotTop-(((1:nrow(colsm))-1)*(1+rowGap))-0.5
-  if(labelsInAxis==TRUE){ axis(2,at=yPts,labels = seqNames,las=2,cex.axis=cex.axis,...) }
+  if(labelsInAxis==TRUE){ axis(2,at=yPts,labels = seqNames,las=2,cex.axis=cex.axis) }
   yPts
 }
 

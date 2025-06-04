@@ -1,8 +1,8 @@
 
 #' @export
 msa <- function(seqDT,method="ClustalOmega",seqType=c("guess","dna","aa"),...){
-  #require(msa)
-  #require(Biostrings)
+  require(msa)
+  require(Biostrings)
   is_seqDT(seqDT,objName = deparse(substitute(seqDT)))
   stringSetFn <- if(seqType[1]=="dna"){
     Biostrings::DNAStringSet

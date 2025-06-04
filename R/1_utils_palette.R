@@ -2,7 +2,7 @@
 
 #' @export
 showPalettes <- function(colPalettes=palettePresets,gradientN=NULL){
-  colPalettes <- flattenList(colPalettes)
+  if(is.list(colPalettes)){ colPalettes <- flattenList(colPalettes) }
   if(is.character(colPalettes)){
     colPalettes <- list(colPalettes)
   }

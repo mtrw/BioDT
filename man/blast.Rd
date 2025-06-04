@@ -13,11 +13,11 @@ blast(
   program = "blastn",
   addAlignments = FALSE,
   outFmtArg =
-    "6       saccver  qaccver length sstart qstart send qend pident evalue bitscore",
-  outputColNames = c("sSeqId", "qSeqId", "matchLength", "sStart", "qStart", "sEnd",
-    "qEnd", "pctId_noGaps", "eValue", "bitscore"),
+    "6       saccver     qaccver       length          sstart      send       qstart      qend       slen         qlen        pident           evalue     bitscore",
+  outputColNames = c("sSeqId", "qSeqId", "matchLength", "sStart", "sEnd", "qStart",
+    "qEnd", "sLength", "qLength", "pctId_noGaps", "eValue", "bitscore"),
   outputColClasses = c("character", "character", "integer", "numeric", "numeric",
-    "numeric", "numeric", "numeric", "numeric", "numeric"),
+    "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"),
   moreBlastArgs = "",
   blastBinaryDir = sub("/blastn$", "", system("which blastn", intern = T)),
   makeBlastDbBinary = system("which makeblastdb", intern = T)

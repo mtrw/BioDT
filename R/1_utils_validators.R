@@ -124,9 +124,9 @@ makeValidator <- function( specName, requiredCols ){
       )[
         ,idx:=1L:.N
       ][
-        ,Class:=get(Required_Column,colSpecList)$class
+        ,Class:=get(Required_Column,colSpecList)$class %>% force
         ,by=.(idx)][
-          ,Notes:=get(Required_Column,colSpecList)$valFun()
+          ,Notes:=get(Required_Column,colSpecList)$valFun() %>% force
           ,by=.(idx)][
             ,idx:=NULL
           ][]

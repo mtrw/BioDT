@@ -1,3 +1,20 @@
+
+#' @export
+combinedVar <- function(n,mu,var){
+  if(length(n)<2 | length(mu)<2 | length(var)<2 | length(n)!=length(mu) | length(mu)!=length(var)){ stop("`n`, `mu`, and `var` must be equal length vectors of length > 1") }
+  cVar <- 0.0
+  for(i in 1:(length(n)-1)){
+    cVar <- ( (n[i]-1)*var[i]+(n[i+1]-1)*var[i+1] )/( n[i]+n[i+1]-1 )  + ( n[i]*n[i+1]*(mu[i]-mu[i+1])**2 )/( (n[i]+n[i+1])*(n[i]+n[i+1]-1) )
+  }
+  cVar
+}
+# You know the means, vars, and sample sizes of some datasets. What is the var of the dataset you would make by combining them?
+
+#' @export
+combinedSd <- function(n,mu,sd){
+  combinedVar(n,mu,sd**2) %>% sqrt
+}
+
 #' @export
 ce <- function(...){
   cat(paste0(...,"\n"), sep='', file=stderr()) %>% eval(envir = globalenv() ) %>% invisible()
@@ -211,6 +228,13 @@ pmean2 <- function(x,y){
 }
 
 #' @export
+pmean <- function(...,na.rm=FALSE){
+  m <- do.call(cbind,list(...))
+  d <- ncol(m)-apply(m,1,function(r){ sum(is.na(r)) })
+  rowSums(m,na.rm=na.rm)/d
+}
+
+#' @export
 mostCommonThing <- function(x,threshold_prop=0,na.rm=T,draw_out=NULL,na_wins_out=NA,threshold_notmet_out=NA){
   #browser()
   if(all(is.na(x))){
@@ -342,7 +366,8 @@ getAlnvCol <- function(seqList,pos){
 
 #' @export
 consensus <- function(seqList){
-  l <- stri_length(seqList[[1]])
+  is_seqListDT(seqList,croak=TRUE,message="Object must be a valid seqListDT.")
+  l <- nchar(seqList[[1]])
   s <- paste0(rep(" ",l),collapse = "")
   for(i in 1:l){ #applyify
     #dev i <- 7
@@ -511,4 +536,28 @@ plusAtinyBit <- function(x,inc={t<-abs(diff(sort(x[!is.na(x)]))); min(t[t>0])}*0
 `%plusMinus%` <- function(x,m,p=m){
   range(x) + c(-m,p)
 }
+
+
+
+# Check must work for from to ranges going in different directions.
+# #' Create a function to project values from one range to another
+# #' @param fromRange The input values of the created function will be assumed to be given on this range.
+# #' @param toRange The created function
+# #' @returns A function of one argument ("values"), which given any value will transform it linearly from `fromRange` to `toRange`.
+# #' @example
+# #' tfm <- makeRangeTransformer(c(0,10),c(100,0))
+# #' tfm(1:9) # returns (90, 80, 70, 60, 50, 40, 30, 20, 10)
+# #' @export
+# makeRangeTransformer <- function(fromRange,toRange){
+#   fromRange <- range(fromRange)
+#   toRange <- range(toRange)
+#   function(values){
+#     (((values - fromRange[1]) / abs(diff(fromRange))) * abs(diff(toRange))) + toRange[1]
+#   }
+# }
+
+
+
+
+
 

@@ -41,8 +41,8 @@ seqDT <- d.t(
   seq2 = c("ABCD","EFGH"),
   seqId = LETTERS[1:2]
 )
-plotNucleotideAlignment(seqDT)
-plotNucleotideAlignment(seqDT,invariantColour = "black")
-plotNucleotideAlignment(seqDT,alnItemCols = applyPalette(1:4,palettePresets$williams),gapColour = "white")
-plotNucleotideAlignment(seqDT[,.(seqId,seq=seq2)])
+plotSequenceAlignment(seqDT)
+plotSequenceAlignment(seqDT,invariantColour = "black")
+plotSequenceAlignment(seqDT,alnItemCols = applyPalette(1:4,palettePresets$williams),gapColour = "white")
+plotSequenceAlignment(seqDT[,.(seqId,seq=seq2)])
 }
