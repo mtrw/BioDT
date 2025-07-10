@@ -9,7 +9,7 @@ blast(
   queryFname = NULL,
   subjectSeqDT = NULL,
   querySeqDT = NULL,
-  outFastaFname = NULL,
+  outFname = NULL,
   program = "blastn",
   addAlignments = FALSE,
   outFmtArg =

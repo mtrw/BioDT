@@ -25,7 +25,7 @@ blast <- function(
   queryFname=NULL,
   subjectSeqDT=NULL,
   querySeqDT=NULL,
-  outFastaFname=NULL,
+  outFname=NULL,
   program="blastn",
   addAlignments=FALSE,
   outFmtArg="6       saccver     qaccver       length          sstart      send       qstart      qend       slen         qlen        pident           evalue     bitscore",
@@ -92,7 +92,7 @@ blast <- function(
     tmp
   })
 
-  if(argGiven(outFastaFname)){
+  if(argGiven(outFname)){
     write.table(bl,outFastaFname,row.names=F,sep="\t",quote=F)
   }
 

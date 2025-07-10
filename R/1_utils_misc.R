@@ -1,5 +1,23 @@
 
 #' @export
+greplAny <- function(patterns,strings){
+  sapply(patterns,function(p) { grepl(p,strings) } ) %>% apply(1,any)
+}
+# like grepl, but asks if any of these patterns are found in each of the strings
+# greplAny(LETTERS,c("A","123","B123","0.00","XYZ","!$@%#$@"))
+
+#' @export
+makeLogFile <- function(...){
+  file.create(logName <- paste0("LOG:",...,collapse=""))
+  logName
+}
+
+#' @export
+removeLogFile <- function(logName){
+  unlink(logName)
+}
+
+#' @export
 combinedVar <- function(n,mu,var){
   if(length(n)<2 | length(mu)<2 | length(var)<2 | length(n)!=length(mu) | length(mu)!=length(var)){ stop("`n`, `mu`, and `var` must be equal length vectors of length > 1") }
   cVar <- 0.0
@@ -313,8 +331,14 @@ scale_between <- function(x,lower,upper){
 
 #An infix wrapper for the above
 #' @export
-`%scale_between%` <- function(x,y){
-  x %>% scale_between(y[1],y[2])
+`%scale_between%` <- function(x,rg){
+  x %>% scale_between(rg[1],rg[2])
+}
+
+#scale a list of values linearly, applying the same transform that would turn rx into ry.
+#' @export
+scale_by_ranges <- function(x,rx=range(x),ry=range(y)){
+  ((x-rx[1]) * diff(ry)/diff(rx)) + ry[1]
 }
 
 #' @export
