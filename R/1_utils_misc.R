@@ -7,14 +7,15 @@ greplAny <- function(patterns,strings){
 # greplAny(LETTERS,c("A","123","B123","0.00","XYZ","!$@%#$@"))
 
 #' @export
-makeLogFile <- function(...){
+makeLogFile <- function(..., contents=""){
   file.create(logName <- paste0("LOG:",...,collapse=""))
+  writeLines(contents,logName)
   logName
 }
 
 #' @export
-removeLogFile <- function(logName){
-  unlink(logName)
+removeLogFile <- function(...){
+  unlink(c(...))
 }
 
 #' @export

@@ -72,9 +72,9 @@ alpha <- function(colChain,setAlpha=1L){
 #' @export
 applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE,returnLegend=FALSE,assignLegend=NULL){ # An evenly spaced palette interpolating the colChain
 
-  # Ascertain discreteness
   bi <- isBehaved(x)
   #n <- length(x)
+  # Ascertain discreteness
   discrete <- if(discreteOrContinuous[1]=="guess"){
     !(is.numeric(x[bi]) | is.integer(x[bi]))
   } else if (discreteOrContinuous[1]=="discrete"){
@@ -103,7 +103,8 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
         if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
       }
       setkey(tbl,joiner)
-      return( tbl[d.t(joiner=x[bi]),on=.(joiner)]$col )
+      return( tbl[d.t(joiner=x),on=.(joiner)]$col )
+
     } else {
       # Interpolate
       p <- character(length(x))
