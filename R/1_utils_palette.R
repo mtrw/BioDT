@@ -71,7 +71,6 @@ alpha <- function(colChain,setAlpha=1L){
 
 #' @export
 applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE,returnLegend=FALSE,assignLegend=NULL){ # An evenly spaced palette interpolating the colChain
-
   bi <- isBehaved(x)
   #n <- length(x)
   # Ascertain discreteness
@@ -85,39 +84,32 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
     stop("Value for `discreteOrContinuous=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
   }
 
-  if(discrete==TRUE){
+  out <- if(discrete==TRUE){
     # Build table per value
     tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
     setkey(tbl,joiner)
-    out <- tbl[d.t(joiner=x[bi]),on=.(joiner)]$col
-    if(returnLegend==TRUE){ return( list(out,tbl[,.(label=joiner,col)]) ) }
-    if(argGiven(assignLegend)){ assign(assignLegend,tbl[,.(label=joiner,col)],envir=globalenv()) }
-    return( out )
+    tbl[d.t(joiner=x),on=.(joiner)]$col
   } else {
     # Check low number of unique vals -- if so, make a table using interpolation and merge
     if(nu(x[bi])/length(x[bi]) < 0.20){
       tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
-      if( returnLegend==TRUE || argGiven(assignLegend) ) {
-        leg <- tbl[,.(label=if(.N>1){c(first(joiner),rep(NA,.N-2),last(joiner))}else{joiner},col)]
-        if( returnLegend==TRUE ){ return( list(out,leg) ) }
-        if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
-      }
       setkey(tbl,joiner)
-      return( tbl[d.t(joiner=x),on=.(joiner)]$col )
-
+      tbl[d.t(joiner=x),on=.(joiner)]$col
     } else {
       # Interpolate
       p <- character(length(x))
       p[bi] <- makePalette(colChain=colChain,at=x[bi],setAlpha=setAlpha)
       p[!bi] <- NA_character_
-      if( returnLegend==TRUE || argGiven(assignLegend) ) {
-        leg <- d.t( col = p[bi] )[order(x[bi]),][,label:=if(.N>1){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
-        if( returnLegend==TRUE ){ return( list(out,leg) ) }
-        if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
-      }
-      return( p )
+      p
     }
   }
+
+
+  if( returnLegend==TRUE | argGiven(assignLegend) ) {
+    leg <- d.t( col = out[bi] )[order(x[bi]),][,label:=if(.N>1){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
+  }
+  if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
+  if( returnLegend==TRUE ){ return( list(colours=out,legend=leg) ) } else { return( out ) }
 }
 
 
