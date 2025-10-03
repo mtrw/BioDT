@@ -38,8 +38,20 @@ startClock <- function(){
 }
 
 #' @export
-stopClock <- function(clockID){
-  timeElapsed <- print(Sys.time() - get(clockID,envir = globalenv()))
+stopClock <- function (clockID){
+  td <- Sys.time() - get(clockID, envir = globalenv())
+  tmp <- as.numeric(td)
+  units <- attributes(td)$units
+
+  elapsed <- switch(units,
+                    "secs" = tmp,
+                    "mins" = tmp * 60,
+                    "hours" = tmp * 3600,
+                    "days" = tmp * 86400,
+                    "weeks" = tmp * 604800,
+                    stop("Unknown time unit: ", units))
+  ce(signif(elapsed,3)," seconds elapsed ...")
+  names(elapsed) <- "seconds"
   rm(clockID)
-  timeElapsed
+  return(invisible(elapsed))
 }
