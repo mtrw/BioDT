@@ -4,10 +4,12 @@
 \alias{ask}
 \title{Collect input from a user interactively.}
 \usage{
-ask(question = "NULL")
+ask(question = "Please enter a value", YN = FALSE)
 }
 \arguments{
-\item{question}{[optional] A question to prompt the user with [NULL]}
+\item{question}{[optional] A question to prompt the user with ["Please enter a value"]}
+
+\item{YN}{[optional] Does the question require a Yes/No answer? If so, the question will be ended with "[Y/N]" and only the responses "Y" and "N" will be accepted--and will return logical `TRUE` or `FALSE` values accordingly. [NULL]}
 }
 \value{
 Whatever the user inputs before pressing <return>, as a character string.

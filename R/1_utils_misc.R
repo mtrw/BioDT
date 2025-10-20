@@ -1,3 +1,37 @@
+#' @export
+Ztransform <- function(x,mean=0.0,sd=1.0,na.rm=FALSE){
+  if(same(x)) return(x)
+  tmp <- (x - mean(x,na.rm=na.rm))/sd(x,na.rm=na.rm)
+  (tmp*sd)+mean
+}
+
+#' @export
+levelFreqs <- function(x) {
+  freq_table <- table(x) / length(x)
+  return(as.numeric(freq_table[as.character(x)]))
+}
+
+#' @export
+prTrue <- function(x,na.rm=FALSE){
+  l <- if(na.rm==TRUE){sum(!is.na(x))}else{length(x)}
+  sum(x==TRUE,na.rm=na.rm)/l
+}
+
+#' @export
+prFalse <- function(x,na.rm=FALSE){
+  l <- if(na.rm==TRUE){sum(!is.na(x))}else{length(x)}
+  sum(x==FALSE,na.rm=na.rm)/l
+}
+
+#' @export
+deg2rad <- function(x){
+  x*((2*pi)/360)
+}
+
+#' @export
+rad2deg <- function(x){
+  x*(360/(2*pi))
+}
 
 #' @export
 greplAny <- function(patterns,strings){
@@ -228,16 +262,31 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL){
 
 #' Collect input from a user interactively.
 #'
-#' @param question [optional] A question to prompt the user with [NULL]
+#' @param question [optional] A question to prompt the user with ["Please enter a value"]
+#' @param YN [optional] Does the question require a Yes/No answer? If so, the question will be ended with "[Y/N]" and only the responses "Y" and "N" will be accepted--and will return logical `TRUE` or `FALSE` values accordingly. [NULL]
 #' @returns Whatever the user inputs before pressing <return>, as a character string.
 #' @examples
 #' while(ask("Guess the number I'm thinking of!")!=sample(1:1e9L,1)){ ce("WRONG!") }
 #' @export
-ask <- function(question="NULL"){
-  if(argGiven(question)){
-    ce(question)
+ask <- function(question="Please enter a value",YN=FALSE){
+  if(YN){
+    qn <-  paste0(q," [Y/N]: ")
+  } else {
+    qn <- paste0(q,": ")
   }
-  readline()
+  ce(qn)
+  r <- readline()
+  if(YN){
+    if(r=="Y"){
+      return(TRUE)
+    } else if (r=="N") {
+      return(FALSE)
+    } else {
+      stop("Answer `Y` or `N` required.")
+    }
+  } else {
+    return(r)
+  }
 }
 
 
@@ -581,8 +630,52 @@ plusAtinyBit <- function(x,inc={t<-abs(diff(sort(x[!is.na(x)]))); min(t[t>0])}*0
 #   }
 # }
 
+#' @export
+rTruncNorm <- function(n = 1, mean = 0, sigma = 1, range = c(-Inf, Inf)) {
+  runif(n, pnorm(range[1], mean, sigma), pnorm(range[2], mean, sigma)) %>%
+    qnorm(mean, sigma)
+}
+
+#' @export
+drawUnitSquareTopRight <- function(x,y,border="#000000",col="#AA0000",xAdj=0.0,yAdj=0.0,scale=1.0,...){
+  rect(x+xAdj,y+yAdj,x+xAdj+scale,y+yAdj+scale,border=border,col=col,...)
+}
+
+#' @export
+drawUnitCircleTopRight <- function(x,y,border="#000000",col="#AA0000",xAdj=0.0,yAdj=0.0,scale=1.0,n = 180,...){
+  c <- circle_seg(x+0.5+xAdj,y+0.5+yAdj,radius=scale/2,start_radians = 0.0,end_radians = 0.0)
+  polygon(c[1,],c[2,],border=border,col=col,...)
+}
+
+#' @export
+heatmap <- function(mat,colPalette=colorRampPalette(c("#3333FFFF","#FFFFFFFF","#FF0000"))(400),NAcol="#BBBBBBFF",labelCex=0.6,...){
+  mat <- d <- as.matrix(mat)
+  n <- nrow(mat)
+  m <- ncol(mat)
+  d[,] <- colPalette[scale_between(mat,1,length(colPalette)) %>% round %>% as.vector()]
+  d[is.na(mat)] <- NAcol # not tested
 
 
 
+  null_plot(1:(n+1),1:(m+1),xaxt="n",yaxt="n",...)
+  axis(2,at=(1:n)+0.5,labels=rownames(d),las=2,cex.axis=labelCex)
+  axis(1,at=(1:n)+0.5,labels=colnames(d),las=3,cex.axis=labelCex)
+  for(i in 1:n){
+    for(j in 1:m){
+      drawUnitSquareTopRight(i,j,col=d[i,j])
+    }
+  }
 
+  heatLegend <- function(){
+    null_plot(0:1,1:(length(colPalette)+1),xaxt="n",yaxt="n")
+    for(j in 1:length(colPalette)){
+      drawUnitSquareTopRight(0,j,border=NA,col=colPalette[j])
+    }
+    axis(2,at=seq(0.5,(length(colPalette)+0.5),l=5),labels=seq(min(mat,na.rm=T),max(mat,na.rm=T),l=5) %>% round(digits = 2),las=2)
+  }
+  heatLegend
+}
+
+# l <- heatmap(mat)
+# l()
 
