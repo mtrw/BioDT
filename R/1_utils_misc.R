@@ -679,3 +679,71 @@ heatmap <- function(mat,colPalette=colorRampPalette(c("#3333FFFF","#FFFFFFFF","#
 # l <- heatmap(mat)
 # l()
 
+#' @export
+recycle <- function(...,length=NULL){
+  #outLen <- 8
+  l <- list(...)
+  outLen <- if(!is.null(length)) { length } else { max(sapply(l,length)) }
+  r <- lapply(l,function(x){
+    #x<-1:2
+    if((((outLen/length(x))%%1)!=0) | outLen<length(x)){ stop(paste0("Sizes of all vectors must recycle evenly into the required output length (",outLen,"), and the input vectors must all be shorter than the output length.")) }
+    rep(x,length.out=outLen)
+  })
+  return(if(!is.null(length) & length(l)==1){r[[1]]}else{r})
+}
+
+
+#' @export
+circle <- function(
+    x=0,
+    y=0,
+    radius=1,
+    border="#000000",
+    col="#000000",
+    lty=1,
+    lwd=1,
+    start_radians=pi,
+    end_radians=pi,
+    n=200,
+    ends=TRUE
+){
+  n <- n+1
+  start_radians <- start_radians %% (2*pi)
+  end_radians <- end_radians %% (2*pi)
+  s <- if(start_radians!=end_radians){ #not a full circle
+    if(start_radians > end_radians){
+      #n <- round( n*((2*pi)+end_radians-start_radians)/(2*pi))
+      seq(start_radians,(2*pi)+end_radians,length.out=n) %% (2*pi)
+    } else {
+      #n <- n * ((end_radians-start_radians)/(2*pi))
+      seq(start_radians,end_radians,length.out=n) %% (2*pi)
+    }
+  } else { #full circle
+    seq(start_radians,start_radians+(2*pi),length.out=n) %% (2*pi)
+  }
+  stopifnot(length(x)==length(y))
+  recycLen <- length(x)
+  radius <- recycle(radius,length=recycLen)
+  border <- recycle(border,length=recycLen)
+  col <- recycle(col,length=recycLen)
+  lty <- recycle(lty,length=recycLen)
+  lwd <- recycle(lwd,length=recycLen)
+  for(i in seq_along(x)){
+    m <- matrix(
+      c(x[i]+radius[i]*sin(s),y[i]+radius[i]*cos(s)),
+      ncol=length(s),
+      byrow=T
+    )
+    m <- if(ends==T){
+      m
+    } else {
+      m[,2:(ncol(m)-1)] # This is good
+    }
+    polygon(x=m[1,],y=m[2,],border=border[i],col=col[i],lty=lty[i],lwd=lwd[i])
+  }
+}
+
+
+
+
+

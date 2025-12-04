@@ -72,7 +72,6 @@ alpha <- function(colChain,setAlpha=1L){
 #' @export
 applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE,returnLegend=FALSE,assignLegend=NULL){ # An evenly spaced palette interpolating the colChain
   bi <- isBehaved(x)
-  #n <- length(x)
   # Ascertain discreteness
   discrete <- if(discreteOrContinuous[1]=="guess"){
     !(is.numeric(x[bi]) | is.integer(x[bi]))
@@ -104,13 +103,14 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
     }
   }
 
-
   if( returnLegend==TRUE | argGiven(assignLegend) ) {
-    leg <- d.t( col = out[bi] )[order(x[bi]),][,label:=if(.N>1){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
+    leg <- d.t( col = out[bi] )[order(x[bi]),][,label:=if(.N>1 & discrete==FALSE){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
   }
   if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
   if( returnLegend==TRUE ){ return( list(colours=out,legend=leg) ) } else { return( out ) }
 }
+debugonce(applyPalette)
+applyPalette(sample(1:3,20,r=T),returnLegend = T)
 
 
 

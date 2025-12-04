@@ -1,3 +1,5 @@
+.gitignore
 dev.R
 .Rproj.user
 .Rhistory
+BioDT.Rproj
