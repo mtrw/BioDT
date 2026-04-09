@@ -109,8 +109,8 @@ applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,dis
   if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
   if( returnLegend==TRUE ){ return( list(colours=out,legend=leg) ) } else { return( out ) }
 }
-debugonce(applyPalette)
-applyPalette(sample(1:3,20,r=T),returnLegend = T)
+# debugonce(applyPalette)
+# applyPalette(sample(1:3,20,r=T),returnLegend = T)
 
 
 
