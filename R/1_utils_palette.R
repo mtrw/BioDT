@@ -70,44 +70,65 @@ alpha <- function(colChain,setAlpha=1L){
 
 
 #' @export
-applyPalette <- function(x,colChain=palettePresets$wheel$wheel,setAlpha=NULL,discreteOrContinuous=c("guess","discrete","continuous"),show=FALSE,returnLegend=FALSE,assignLegend=NULL){ # An evenly spaced palette interpolating the colChain
+applyPalette <- function (x, colChain = palettePresets$wheel$wheel, setAlpha = NULL,
+                          discreteOrContinuous = c("guess", "discrete", "continuous"),
+                          show = FALSE, returnLegend = FALSE, assignLegend = NULL, discreteLegendN = 300)
+{
   bi <- isBehaved(x)
-  # Ascertain discreteness
-  discrete <- if(discreteOrContinuous[1]=="guess"){
+  discrete <- if (discreteOrContinuous[1] == "guess") {
     !(is.numeric(x[bi]) | is.integer(x[bi]))
-  } else if (discreteOrContinuous[1]=="discrete"){
+  }
+  else if (discreteOrContinuous[1] == "discrete") {
     TRUE
-  } else if (discreteOrContinuous[1]=="continuous"){
+  }
+  else if (discreteOrContinuous[1] == "continuous") {
+    if(!(is.numeric(x[bi]) | is.integer(x[bi]))){ stop("For a continuous palette, `x` must be a numeric or integer vector ...") }
     FALSE
-  } else {
+  }
+  else {
     stop("Value for `discreteOrContinuous=` argument must be \"discrete\" or \"continuous\" or \"guess\" ...")
   }
-
-  out <- if(discrete==TRUE){
-    # Build table per value
-    tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,n=.N,setAlpha=setAlpha)][]
-    setkey(tbl,joiner)
-    tbl[d.t(joiner=x),on=.(joiner)]$col
-  } else {
-    # Check low number of unique vals -- if so, make a table using interpolation and merge
-    if(nu(x[bi])/length(x[bi]) < 0.20){
-      tbl <- d.t(joiner=unique(x[bi]))[,col:=makePalette(colChain,at=joiner,setAlpha=setAlpha)][]
-      setkey(tbl,joiner)
-      tbl[d.t(joiner=x),on=.(joiner)]$col
-    } else {
-      # Interpolate
+  out <- if (discrete == TRUE) {
+    tbl <- d.t(joiner = unique(x[bi]))[, `:=`(col, makePalette(colChain,
+                                                               n = .N, setAlpha = setAlpha))][]
+    setkey(tbl, joiner)
+    tbl[d.t(joiner = x), on = .(joiner)]$col
+  }
+  else {
+    if (nu(x[bi])/length(x[bi]) < 0.2) {
+      tbl <- d.t(joiner = unique(x[bi]))[, `:=`(col, makePalette(colChain,
+                                                                 at = joiner, setAlpha = setAlpha))][]
+      setkey(tbl, joiner)
+      tbl[d.t(joiner = x), on = .(joiner)]$col
+    }
+    else {
       p <- character(length(x))
-      p[bi] <- makePalette(colChain=colChain,at=x[bi],setAlpha=setAlpha)
+      p[bi] <- makePalette(colChain = colChain, at = x[bi],
+                           setAlpha = setAlpha)
       p[!bi] <- NA_character_
       p
     }
   }
-
-  if( returnLegend==TRUE | argGiven(assignLegend) ) {
-    leg <- d.t( col = out[bi] )[order(x[bi]),][,label:=if(.N>1 & discrete==FALSE){c(min(x[bi]),rep(NA,.N-2),max(x[bi]))}else{x[bi]}][]
+  if (returnLegend == TRUE | argGiven(assignLegend)) {
+    leg <- if(discrete==TRUE){
+      tbl[,.(col,label=joiner)]
+    } else {
+      xRg <- range(x,na.rm=T)
+      d.t(
+        col=makePalette(colChain,discreteLegendN),
+        labels=c(xRg[1],rep(NA,discreteLegendN-2),xRg[2])
+      )
+    }
   }
-  if( argGiven(assignLegend) ) { assign(assignLegend,leg,envir=globalenv()) }
-  if( returnLegend==TRUE ){ return( list(colours=out,legend=leg) ) } else { return( out ) }
+  if (argGiven(assignLegend)) {
+    assign(assignLegend, leg, envir = globalenv())
+  }
+  if (returnLegend == TRUE) {
+    return(list(colours = out, legend = leg))
+  }
+  else {
+    return(out)
+  }
 }
 # debugonce(applyPalette)
 # applyPalette(sample(1:3,20,r=T),returnLegend = T)
@@ -157,3 +178,7 @@ plotLegend <- function( xRange , yRange , legendDT , col_bg="#FFFFFFFF" , col_bo
 }
 
 
+#' @export
+alpha <- function(cols, alpha = 1) {
+  rgb(t(col2rgb(cols)), maxColorValue = 255, alpha = alpha * 255)
+}

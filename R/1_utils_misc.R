@@ -270,9 +270,9 @@ gridApplyDT <- function(dtx,dty=NULL,FUN,nameColx=NULL,nameColy=NULL){
 #' @export
 ask <- function(question="Please enter a value",YN=FALSE){
   if(YN){
-    qn <-  paste0(q," [Y/N]: ")
+    qn <-  paste0(question," [Y/N]: ")
   } else {
-    qn <- paste0(q,": ")
+    qn <- paste0(question,": ")
   }
   ce(qn)
   r <- readline()
